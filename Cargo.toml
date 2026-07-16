@@ -2,7 +2,7 @@
 members = [
   "gouda_core",
   "gouda_proto",
-  "examples/rust_gouda_app",
+  "examples/*",
 ]
 resolver = "2"
 

@@ -1,5 +1,5 @@
 [package]
-name = "rust_gouda_app"
+name = "gouda_sandbox"
 edition = "2024"
 version.workspace = true
 

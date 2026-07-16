@@ -1147,6 +1147,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "gouda_sandbox"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "eframe",
+ "egui",
+ "egui-toast",
+ "gouda_proto",
+ "interprocess",
+ "prost",
+ "serde",
+ "serde_json",
+ "strum",
+ "strum_macros",
+]
+
+[[package]]
 name = "half"
 version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2407,23 +2424,6 @@ dependencies = [
  "serde_derive",
  "typeid",
  "unicode-ident",
-]
-
-[[package]]
-name = "rust_gouda_app"
-version = "0.1.0"
-dependencies = [
- "clap",
- "eframe",
- "egui",
- "egui-toast",
- "gouda_proto",
- "interprocess",
- "prost",
- "serde",
- "serde_json",
- "strum",
- "strum_macros",
 ]
 
 [[package]]
