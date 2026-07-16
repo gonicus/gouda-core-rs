@@ -1,0 +1,29 @@
+default:
+  image: fedora:latest
+  interruptible: true
+
+stages:
+  - test
+  - deploy
+
+Compile Lint:
+  stage: test
+
+  script:
+    - dnf install protobuf-compiler -y
+    - mkdir .out
+    - protoc --fatal_warnings --cpp_out=.out *.proto  
+
+Create Doc:
+  stage: deploy
+  image: pseudomuto/protoc-gen-doc
+
+  script:
+    - mkdir proto-doc
+    - protoc --doc_out=proto-doc --doc_opt=html,index.html *.proto
+
+  pages:
+    publish: proto-doc
+
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH

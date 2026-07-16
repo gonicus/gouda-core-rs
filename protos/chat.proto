@@ -1,0 +1,1279 @@
+syntax = "proto3";
+
+package de.gonicus.gonnect;
+
+// Generic container for any message that is sent to the headless client.
+// Every message sent to the client must be wrapped in this container.
+message RequestContainer {
+
+    // A tag to identify this "to client" message and relate it to the response
+    // in "from client" message. The value 0 means "no identification", i.e. a
+    // specific response is not expected.
+    uint64 tag = 1;
+
+    // The payload; one of these requests.
+    oneof content {
+        InitializationRequest initializationRequest = 2;
+        LoginFlowsRequest loginFlowsRequest = 3;
+        IdentityProvidersRequest identityProvidersRequest = 4;
+        LoginUsernamePasswordRequest loginUsernamePasswordRequest = 5;
+        LoginSSORequest loginSSORequest = 6;
+        RecoveryKeyVerificationRequest recoveryKeyVerificationRequest = 7;
+        CrossSigningStartRequest crossSigningStartRequest = 8;
+        CrossSigningMethodSelectedRequest crossSigningMethodSelectedRequest = 9;
+        CrossSigningConfirmRequest crossSigningConfirmRequest = 10;
+        VerificationAbortRequest verificationAbortRequest = 11;
+        GlobalSettingsRequest globalSettingsRequest = 33;
+
+        UserRequest userRequest = 12;
+        UserSearchRequest userSearchRequest = 13;
+        UserStatus userStatusSetOwnRequest = 32;
+
+        PublicRoomListRequest publicRoomListRequest = 14;
+        InvitationRequest invitationRequest = 15;
+        InvitedReply invitedReply = 16;
+
+        RoomListRequest roomListRequest = 17;
+        RoomCreateGroupRequest roomCreateGroupRequest = 18;
+        RoomCreateDirectRequest roomCreateDirectRequest = 19;
+        RoomChangeRequest roomChangeRequest = 20;
+        RoomLeaveRequest roomLeaveRequest = 21;
+        RoomJoinRequest roomJoinRequest = 22;
+        RoomKnockRequest roomKnockRequest = 23;
+        RoomMessagesRequest roomMessagesRequest = 24;
+        RoomMarkAsReadRequest roomMarkAsReadRequest = 25;
+        RoomTypingRequest roomTypingRequest = 34;
+
+        MessageSendRequest messageSendRequest = 26;
+        MessageRemoveRequest messageRemoveRequest = 27;
+        MessageChangeRequest messageChangeRequest = 28;
+        Reaction createReactionRequest = 29;
+        Reaction removeReactionRequest = 30;
+        MessageRequest messageRequest = 31;
+    }
+}
+
+// Generic container for any message that is sent from the headless client.
+// Every message sent from the client must be wrapped in this container.
+message ResponseContainer {
+
+    // A tag to identify which "to client" message this belongs to.
+    // The value 0 means "no identification", i.e. the message does not relate
+    // to a request.
+    uint64 tag = 1;
+
+    // The payload; one of these requests.
+    oneof content {
+        Error error = 2;
+        CapabilityEvent capabilityEvent = 3;
+
+        StatusUpdate statusUpdate = 4;
+        LoginFlowsResponse loginFlowsResponse = 5;
+        LoginSSOResponse loginSSOResponse = 6;
+        IdentityProvidersResponse identityProvidersResponse = 7;
+        VerificationStatusEvent verificationStatusEvent = 8;
+        CrossSigningPromptEvent crossSigningPromptEvent = 9;
+        CrossSigningStartResponse crossSigningStartResponse = 10;
+        CrossSigningStartEvent crossSigningStartEvent = 11;
+        CrossSigningMethodSelectedEvent crossSigningMethodSelectedEvent = 12;
+        VerificationEndEvent verificationEndEvent = 13;
+        GlobalSettings globalSettingsEvent = 31;
+
+        User userResponse = 14;
+        UserSearchResponse userSearchResponse = 15;
+        UserChangeEvent userChangeEvent = 16;
+
+        PublicRoomListResponse publicRoomListResponse = 17;
+        InvitedEvent invitedEvent = 18;
+
+        RoomListResponse roomListResponse = 19;
+        Room roomCreatedEvent = 20;
+        RoomLeftEvent roomLeftEvent = 21;
+        RoomChangeEvent roomChangeEvent = 22;
+
+        MessageSendResponse messageSendResponse = 23;
+        MessageRemoveEvent messageRemoveEvent = 24;
+        Message messageReceivedEvent = 25;
+        MessageChangeEvent messageChangeEvent = 26;
+        Reaction reactionCreatedEvent = 27;
+        Reaction reactionRemovedEvent = 28;
+        Message messageResponse = 29;
+
+        MultipartEnd multipartEnd = 30;
+
+    }
+}
+
+// Generic error occurred in the backend or the headless client.
+message Error {
+
+    enum errorType {
+
+        // An error that cannot be described by any of the other values or its
+        // nature is unknown. Using one of the other more specific error type is
+        // preferred.
+        Unknown = 0;
+
+        // When a response was not received in a pre-defined time.
+        Timeout = 1;
+
+        // The error happened with the network connection or failing transport.
+        Network = 2;
+
+        // Whenever the required authorization is missing.
+        Authorization = 3;
+
+        // The requested feature is not implemented for this client. This should
+        // reflect in CapabilityResponse.
+        NotImplemented = 4;
+
+        // The client has not yet been initialized.
+        NotInitialized = 5;
+
+        // A string that should have been formatted as an URL was not a valid
+        // URL.
+        InvalidUrl = 6;
+
+        // The room with the requested ID was not found.
+        RoomNotFound = 7;
+
+        // The verification flow with the requested ID was not found.
+        VerificationFlowNotFound = 8;
+
+        // The given recovery key is invalid.
+        InvalidRecoveryKey = 9;
+
+        // The given user ID is invalid.
+        InvalidUserId = 10;
+
+        // The given message ID is invalid.
+        InvalidMessageId = 11;
+
+        // The message with the given ID was not found.
+        MessageNotFound = 12;
+
+        // An authorization flow was requested but the client is already logged in.
+        AlreadyLoggedIn = 13;
+
+        // An initialization request was made, but the client is already initialized.
+        AlreadyInitialized = 14;
+
+        // The requested reaction was not found.
+        ReactionNotFound = 15;
+
+        // The user does not have sufficient permissions to perform the requested action.
+        NotAllowed = 16;
+
+        // The requested user was not found.
+        UserNotFound = 17;
+    };
+
+    // The type of this error.
+    errorType type = 1;
+
+    // An optional string describing details of the error.
+    optional string errorString = 2;
+}
+
+// Object used to mark a multi-part answer as complete.
+message MultipartEnd { }
+
+// Initializes a client and establishes a connection to the specified backend.
+// A StatusUpdate is returned when the connection was successful.
+message InitializationRequest {
+    // The URL of the backend to which a connection should be established.
+    string backendUrl = 1;
+
+    // Path to a readable and writable folder in the system which serves as a
+    // root path for mutual data, like images.
+    string dataRootPath = 2;
+
+    // Secret for access to the client's secret storage (i.e. database).
+    string persistentStorageSecret = 3;
+
+    // Secret the client can use for encryption and decryption of arbitrary
+    // data.
+    string encryptionSecret = 4;
+
+    // The display name of this device.
+    string deviceDisplayName = 5;
+}
+
+// Send when the verification status or related information has changed. Must
+// be sent at least once if CapabilityResponse.clientVerification is true. If
+// that is not true, it must not be sent at all.
+message VerificationStatusEvent {
+
+    // Whether this client/device is verified.
+    bool isVerified = 1;
+
+    // Whether this client/device can verify itself by sending a recovery key
+    // via RecoveryKeyVerificationRequest.
+    bool isRecoveryKeyVerificationAvailable = 2;
+
+    // Whether an unverified device can currently be verified via
+    // cross-signing.
+    bool isCrossSigningAvailable = 3;
+}
+
+// Different types of cross signing verification methods.
+enum crossSigningMethod {
+
+    // A simple string.
+    SasString = 0;
+
+    // A sequence of symbols (e.g. emojis).
+    SasSymbol = 1;
+}
+
+// Try to verify this device with the givenrecovery key.
+// Expects a VerificationEndEvent afterwards.
+message RecoveryKeyVerificationRequest {
+    string recoveryKey = 1;
+}
+
+// Another device wants to verify this one.
+// The client is expected to send either a CrossSigningStartRequest in order to
+// accept the prompt, or a VerificationAbortRequest to reject it.
+message CrossSigningPromptEvent {
+
+    // Identifier for the verification flow id.
+    string verificationFlowId = 1;
+}
+
+// The client declares it likes to start a cross signing verification process.
+// A CrossSigningStartResponse is expected to be received next.
+message CrossSigningStartRequest {
+
+    // Id of the flow if responding to a CrossSigningPromptEvent. If such did
+    // not happen, this field must be omitted.
+    optional string verificationFlowId = 1;
+
+    // All cross signing methods this client supports. It must not be empty.
+    repeated crossSigningMethod supportedMethods = 2;
+}
+
+// Confirms a new cross signing flow was started.
+message CrossSigningStartResponse {
+    // The ID  of the newly created verification flow.
+    string verificationFlowId = 1;
+}
+
+// The backend declares it the cross signing verification flow has started.
+// The headless client either expects a CrossSigningMethodSelectRequest next or
+// will send a CrossSigningMethodSelectedEvent when another client has selected
+// a method sooner.
+message CrossSigningStartEvent {
+    string verificationFlowId = 1;
+
+    // List of cross signing methods that are available among all clients and
+    // the backend. One of this must be chosen to proceed. Must not be empty.
+    repeated crossSigningMethod availableMethods = 2;
+}
+
+// Send in response to a CrossSigningStartEvent to select the cross signing
+// method. A CrossSigningMethodSelectedEvent is expected in return.
+message CrossSigningMethodSelectedRequest {
+    string verificationFlowId = 1;
+
+    // The selected method. Must be one of those received in the according
+    // CrossSigningStartEvent.
+    crossSigningMethod selectedMethod = 2;
+}
+
+// Propagates the method selected for the cross signing process. Must be
+// followed by either a CrossSigningAcceptRequest or a
+// VerificationAbortRequest.
+message CrossSigningMethodSelectedEvent {
+    string verificationFlowId = 1;
+    crossSigningMethod selectedMethod = 2;
+
+    // Code to match for the verification. Depends on the selected method.
+    oneof verificationCode {
+
+        // A simple string for the SasString method.
+        string stringCode = 3;
+
+        // A sequence of symbols for the SasSymbol method.
+        VerificationSymbolSequence symbols = 4;
+    }
+}
+
+// Accepts the verification. Must be followed by VerificationEndEvent.
+message CrossSigningConfirmRequest {
+    string verificationFlowId = 1;
+}
+
+// Sequence of VerificationSymbol.
+message VerificationSymbolSequence {
+    repeated VerificationSymbol symbols = 1;
+}
+
+// A single symbol for the SasSymbol verification method.
+message VerificationSymbol {
+
+    // The symbol itself (e.g. emoji).
+    string symbol = 1;
+
+    // Optional description to be shown with the symbol.
+    optional string description = 2;
+}
+
+// This client wants to abort the verification process. Is expected to be
+// followed by a VerificationEndEvent.
+message VerificationAbortRequest {
+    string verificationFlowId = 1;
+}
+
+// Send when the verification process has ended, because it was either
+// successful, or cancelled or erroneous.
+message VerificationEndEvent {
+
+    // Id of the verification flow. Might be omitted if this is a direct final
+    // response to the process such that no id was known before.
+    optional string verificationFlowId = 1;
+
+    oneof result {
+        // Whether the verification has ended successfully or was aborted.
+        bool successful = 2;
+
+        // Verification has ended with an error; this is an error message.
+        string error = 3;
+    }
+}
+
+// Request to retrieve the login flows supported by the backend.
+message LoginFlowsRequest { }
+
+// Returns the login flows supported by the backend.
+message LoginFlowsResponse {
+
+    enum loginFlow {
+
+        // If the backend supports username and password authentication.
+        UsernamePassword = 0;
+
+        // If the backend supports single sign-on authentication.
+        SSO = 1;
+    }
+
+    // The supported login flows.
+    repeated loginFlow loginFlows = 2;
+}
+
+// Request to log in to the client using username and password.
+// Use LoginFlowsRequest to ensure that the backend supports this authentication
+// method. A StatusUpdate is returned when the login request was successful.
+message LoginUsernamePasswordRequest {
+    string username = 1;
+    string password = 2;
+}
+
+// Request to log in to the client using single sign-on.
+// Use LoginFlowsRequest to ensure that the backend supports this authentication
+// method.
+message LoginSSORequest {
+    // The identity provider to be used for login.
+    // Use IdentityProviderRequest to retrieve the available identity providers.
+    optional string identityProvider = 1;
+}
+
+// Confirms the single sign-on authentication was initiated.
+// A StatusUpdate is returned when the login request was successful and the
+// access token was retrieved.
+message LoginSSOResponse {
+    // A url that must be opened in a web browser to continue the login process.
+    string loginUrl = 1;
+}
+
+// Request to retrieve the available identity providers for single sing-on
+// authentication.
+message IdentityProvidersRequest { }
+
+// Returns the available identity providers.
+message IdentityProvidersResponse {
+    // The ID of the available identity providers.
+    // Use one of the returned IDs inside the SSOLoginRequest.
+    repeated string identityProviders = 1;
+}
+
+// Notifies about changes in the connection state between headless client and
+// backend.
+message StatusUpdate {
+
+    enum statusCode {
+        // The user has been logged out and is not logged in any longer. The
+        // user can attempt to login again.
+        LoggedOut = 0;
+
+        // The server is connected, but the client is not authorized yet.
+        Connected = 1;
+
+        // The server is connected and the client is authorized.
+        LoggedIn = 2;
+
+        // The headless client has no network connection to the backend. Any
+        // attempt to login or send requests will be responded with errors.
+        NetworkUnavailable = 3;
+
+        // The session has been invalidated (usually by another client). Other
+        // than that, it has the same semantics as "LoggedOut".
+        SessionInvalid = 4;
+
+        reserved "Disconnected";
+    }
+
+    // The current connection status.
+    statusCode code = 1;
+}
+
+// Request the headless client to send the capabilities of the backend.
+message CapabilityRequest { }
+
+// The capabilities (supported features) of the backend.
+message CapabilityEvent {
+
+    // The backend supports direct communication between two users.
+    bool directRooms = 1;
+
+    // The backend supports chat rooms between multiple users.
+    bool groupRooms = 2;
+
+    // The backend supports creation of sub threads inside a chat room.
+    bool subThreads = 3;
+
+    // The backend supports searching for people known to the chat system.
+    bool userSearch = 5;
+
+    // The backend supports inviting users to rooms.
+    bool invitations = 6;
+
+    // The backend supports spaces as logical groups of rooms.
+    bool spaces = 7;
+
+    // The protocol has a verification process for clients. This does neither
+    // mean that the backend actually supports it, nor that the client
+    // actually requires verification.
+    bool clientVerification = 8;
+
+    // The backend supports a presence state for users.
+    bool userPresence = 9;
+
+    // List of MIME types that can be send via the backend.
+    repeated string mimeTypes = 4;
+}
+
+// A message sent to a room.
+message Message {
+
+    // Id of the room this message is sent to.
+    string roomId = 1;
+
+    // Unique string identifying the message.
+    string messageId = 2;
+
+    // Id of the sender, which might be a user or the room itself in case of
+    // room messages.
+    string senderId = 3;
+
+    // Creation time of the message in milliseconds from 01.01.1970 00:00 UTC.
+    uint64 timestamp = 4;
+
+    // The original message this relates to, e.g. when answering to a specific
+    // message.
+    optional string relatedMessageId = 5;
+
+    // Whether this message is pinned, i.e. prominently shown in the room.
+    bool isPinned = 6;
+
+    // Whether this message is considered to be encrypted - which means that the latest
+    // decryption attempt failed. When this field is true, server implementations should
+    // leave the `content` empty and clients should ignore the value of `content`.
+    bool isEncrypted = 7;
+
+    // Contains all reactions to this message.
+    repeated Reaction reactions = 8;
+
+    // The actual content of the message.
+    // Not specifying the content is not allowed.
+    oneof content {
+        // The message content if it is a plain text message.
+        MessageContentText text = 9;
+
+        // The message content if it is a file.
+        MessageContentFile file = 11;
+
+        // The message content if it is a membership change.
+        MessageContentMembershipChange membershipChange = 12;
+    }
+
+    reserved 14, 15;
+    reserved "audioFile", "videoFile";
+
+    // Ids of users that have been mentioned in this message.
+    repeated string mentionedUserIds = 13;
+}
+
+message MessageContentText {
+
+    // The actual plain text content of the message.
+    string content = 1;
+}
+
+message MessageContentFile {
+
+    // The relative path to the file starting from
+    // the `InitializationRequest::dataRoorPath`.
+    string filePath = 1;
+
+    // The name of the file, if available.
+    optional string fileName = 2;
+}
+
+// The message content, if it is a message about a change in membership,
+// for example, when a user has left or entered the room.
+// The affected user may differ from the sender and is listed separately here.
+message MessageContentMembershipChange {
+
+    enum MembershipChange {
+        Joined = 0;
+        Left = 1;
+        Invited = 2;
+        Knocked = 3;
+        Banned = 4;
+        Unbanned = 5;
+        Kicked = 6;
+    }
+
+    // The change of membership status.
+    MembershipChange change = 1;
+
+    // The ID of the user the change applies to
+    string affectedUserId = 2;
+}
+
+// Request a single specific message.
+message MessageRequest {
+
+    // Id of the room this message is from.
+    string roomId = 1;
+
+    // Id of the message itself.
+    string messageId = 2;
+}
+
+// Request to send a new message to a room.
+message MessageSendRequest {
+
+    // Id of the room this message is sent to.
+    string roomId = 1;
+
+    // The original message this relates to, e.g. when answering to a specific
+    // message.
+    optional string relatedMessageId = 2;
+
+    // The actual content of the message.
+    // This field must not be empty.
+    oneof content {
+        // The message content if it is a plain text message.
+        MessageContentText text = 3;
+
+        // The message content if it is a file.
+        MessageContentFile file = 5;
+    }
+
+    reserved 7, 8;
+    reserved "audioFile", "videoFile";
+
+    // Ids of users that have been mentioned in this message.
+    repeated string mentionedUserIds = 6;
+}
+
+// Confirms that a message has been sent.
+// A MessageReceivedEvent will not be created for messages that have been sent
+// via this client.
+message MessageSendResponse {
+
+    // Unique id to identify the message (e.g. for later modification).
+    string messageId = 1;
+}
+
+// Request changes to the content of an existing chat message.
+// A MessageChangeEvent or an Error is expected to be received afterwards.
+message MessageChangeRequest {
+
+    // The ID of the room the message is located.
+    string roomId = 1;
+
+    // Id of the chat message that shall be changed.
+    string messageId = 2;
+
+    // The new content of the message.
+    // This field must not be empty. In order to remove a message, a
+    // MessageRemoveRequest must be made.
+    oneof content {
+        // The message content if it is a plain text message.
+        MessageContentText text = 4;
+
+        // The message content if it is a file.
+        MessageContentFile file = 6;
+    }
+
+    reserved 9, 10;
+    reserved "audioFile", "videoFile";
+
+    // Whether mentionedUserIds should be updated.
+    bool hasMentionedUserIdsChanged = 7;
+
+    // Ids of users that have been mentioned in this message. The value of this
+    // field is only defined when hasMentionedUserIdsChanged is true.
+    repeated string mentionedUserIds = 8;
+}
+
+// Notifies about changes in a single Message.
+message MessageChangeEvent  {
+
+    // The ID of the room the message is located.
+    string roomId = 1;
+
+    // Id of the changed message. Must be a valid id of an already existing
+    // message.
+    string messageId = 2;
+
+    // Whether the message is pinned (i.e. shown prominently in the room) or
+    // not. Shall only be set if it has changed.
+    optional bool isPinned = 3;
+
+    // Whether the message is encrypted or not. Shall only be set if it has
+    // changed. If it changes, the content should usually change as well.
+    optional bool isEncrypted = 4;
+
+    // If set, a new content for the message.
+    oneof content {
+        // The message content if it is a plain text message.
+        MessageContentText text = 5;
+
+        // The message content if it is a file.
+        MessageContentFile file = 7;
+
+        // The message content if it is a membership change.
+        MessageContentMembershipChange membershipChange = 10;
+    }
+
+    reserved 11, 12;
+    reserved "audioFile", "videoFile";
+
+    // Whether the field mentionedUserIds has changed.
+    bool hasMentionedUserIdsChanged = 8;
+
+    // Ids of users that have been mentioned in this message. The value of this
+    // field is only defined when hasMentionedUserIdsChanged is true.
+    repeated string mentionedUserIds = 9;
+}
+
+// Request the backend to retract and delete an existing message.
+// Must result in an Error or MessageRemoveEvent.
+message MessageRemoveRequest {
+
+    // The ID of the room the message is located.
+    string roomId = 1;
+
+    // Id of the chat message that shall be removed.
+    string messageId = 2;
+}
+
+// Specifies the origin of an event (where ambiguous)
+enum EventOrigin {
+
+    // The event was user-initiated
+    UserOrigin = 0;
+
+    // The event was initiated by the backend application
+    BackendOrigin = 1;
+}
+
+// Event notifying that a message has been retracted and removed.
+message MessageRemoveEvent {
+
+    // The ID of the room the message is located.
+    string roomId = 1;
+
+    // Id of the removed message.
+    string messageId = 2;
+
+    // Optional reason for the removal
+    optional string reason = 3;
+
+    // The origin the the removal event
+    EventOrigin origin = 4;
+}
+
+// Request a list of rooms.
+message RoomListRequest {
+
+    // Whether the resulting list shall include room which the user is a member
+    // of.
+    bool includeJoined = 1;
+
+    // Whether the resulting list shall include room which the user is not a
+    // member of.
+    bool includeUnjoined = 2;
+}
+
+// Response to a RoomListResponse.
+message RoomListResponse {
+
+    // The requested list of rooms.
+    repeated Room roomList = 1;
+}
+
+// Describes a single user entity.
+message User {
+
+    // Unique string which identifies the user.
+    string userId = 1;
+
+    // Optional nice name to display instead of the userId.
+    optional string displayName = 2;
+
+    // The relative path from the `dataRootPath` directory to the downloaded user
+    // avatar, if any is available.
+    optional string avatarPath = 4;
+
+    // The status of the user.
+    UserStatus status = 5;
+
+    reserved 3;
+    reserved "presenceState";
+}
+
+// Request to fetch the information of a single user.
+// An UserResponse is expected next.
+message UserRequest {
+
+    // The ID of the user to fetch information from.
+    string userId = 1;
+}
+
+message UserChangeEvent {
+
+    // The ID of the user this change occurs.
+    string userId = 1;
+
+    // New status of the user. If not set the status did not
+    // change. May only be set when userPresence capability is set.
+    optional UserStatus status = 2;
+
+    // New display name for the user, if set.
+    optional string displayName = 3;
+
+    // New path to a changed avatar image, relative to the dataRootPath of the
+    // client. If empty, the avatar has been removed. If not set, it remains
+    // unchanged.
+    optional string avatarPath = 4;
+}
+
+// A space describes a logical group of chat rooms.
+message Space {
+
+    // Unique identifier of the space.
+    string spaceId = 1;
+
+    // User-friendly display name for the space.
+    optional string displayName = 2;
+}
+
+// Possible states that a user can have in a room.
+enum UserRoomState {
+    Unjoined = 0;
+    Joined = 1;
+    Invited = 2;
+    Knocked = 3;
+    Banned = 4;
+}
+
+enum PresenceState {
+    Unknown = 0;
+    Offline = 1;
+    Away = 2;
+    Online = 3;
+}
+
+// When a notification on a new message shall be created.
+enum NotificationSetting {
+
+    // Notification for every message.
+    AllMessages = 0;
+
+    // Only if the user is mentioned directly or a keyword (such as "@room") is
+    // used.
+    MentionsAndKeywordsOnly = 1;
+
+    // No notifications for any message.
+    Mute = 2;
+}
+
+// Request global settings; GlobalSettingsEvent is expected in return, if
+// StatusUpdate.statusCode is LoggedIn, or an error if not logged in.
+message GlobalSettingsRequest {
+}
+
+// Response to GlobalSettingsRequest (with tag) or when the settings have
+// changed on the backend (without tag).
+message GlobalSettings {
+
+    // The global settings for notification incoming messages.
+    NotificationSetting notificationSetting = 1;
+}
+
+// Room-specific settings
+message RoomSettings {
+
+    // The room-specific settings for notification incoming messages which
+    // overrides the global setting. If not set, the global settings will be
+    // used.
+    optional NotificationSetting notificationSetting = 1;
+}
+
+// Describes a room entity. This might be a room with several users or just a
+// direct chat between two.
+message Room {
+
+    // Unique string identifying the room.
+    string roomId = 1;
+
+    // Nice name to display instead of the roomId.
+    optional string displayName = 2;
+
+    // Ids of all users in this room with their current state, including our own
+    // user.
+    map<string, UserRoomState> userIdList = 3;
+
+    // Ids of the spaces this room belongs to.
+    // This is only to be set if the backend supports the spaces capability and
+    // the room actually belongs to at least one space.
+    repeated string spaceId = 4;
+
+    // Number of unread messages and notifications in this room.
+    uint32 unreadCount = 5;
+
+    // If the room is a direct room or group room.
+    bool isDirect = 6;
+
+    // The join rule of this room.
+    RoomJoinRule joinRule = 7;
+
+    // The permissions this client has in the room.
+    RoomPermissions permissions = 8;
+
+    // Timestamp in milliseconds since January 1, 1970, 00:00 UTC of the last
+    // send or received message. Unset if no activity has occurred yet.
+    optional uint64 latestMessageTimestamp = 9;
+
+    // The relative path from the `dataRootPath` directory to the downloaded room
+    // avatar, if any is available.
+    optional string avatarPath = 10;
+
+    // Whether the room is tagged as favorite by the user.
+    bool isFavorite = 11;
+
+    // Room-specific settings
+    RoomSettings roomSettings = 12;
+}
+
+// Defines single points of authorization for a room that may or may not be done
+// by this client's user.
+message RoomPermissions {
+
+    // The user can edit basic information of the room, such as the name or
+    // topic.
+    bool canEdit = 1;
+
+    // The user can invite other users to the room.
+    bool canInvite = 2;
+
+    // The user can kick other users out of the room.
+    bool canKick = 3;
+
+    // The user can ban other users from the room.
+    bool canBan = 4;
+}
+
+// Informs the client about changes in a single room.
+message RoomChangeEvent {
+
+    // The id of the room this change occurs.
+    string roomId = 1;
+
+    // If the userIdList has changed with this event.
+    // If false, the userIdList has not changed and only contains a
+    // default value that should not be used.
+    bool hasUserIdListChanged = 6;
+
+    // If the typingUserIdList has changed with this event.
+    // If false, the typingUserIdList has not changed and only contains a
+    // default value that should not be used.
+    bool hasTypingUserIdListChanged = 7;
+
+    // User ids and their new state if they have changed. Users with unchanged
+    // state must not appear in this list.
+    map<string, UserRoomState> userIdList = 2;
+
+    // List of ids of all users which are currently typing.
+    repeated string typingUserIdList = 3;
+
+    // Updated display name of the room, if it has changed.
+    optional string displayName = 4;
+
+    // Updated number of unread messages and notifications in this room, if it
+    // has changed.
+    optional uint32 unreadCount = 5;
+
+    // Updated join rule of the room, if it has changed.
+    optional RoomJoinRule joinRule = 8;
+
+    // Whether the room is a direct room or not. Should only be set if the value
+    // has changed.
+    optional bool isDirect = 9;
+
+    // The permissions this client has in the room. Should only be set if the
+    // value has changed.
+    optional RoomPermissions permissions = 10;
+
+    // The relative path from the `dataRootPath` directory to the downloaded room
+    // avatar, if it has changed.
+    optional string avatarPath = 11;
+
+    // If set, the favorite state has changed to the given value.
+    optional bool isFavorite = 12;
+
+    // Set when the room-specific settings have changed. The message must
+    // contain all of the room settings, even those which have not changed.
+    optional RoomSettings roomSettings = 13;
+}
+
+// Notify the client that messages and notifications in this room have been
+// read by the user.
+// Expects a RoomChangeEvent with unreadCount = 0 in return.
+message RoomMarkAsReadRequest {
+    string roomId = 1;
+}
+
+// Activate typing notice for the current user in the specified room.
+message RoomTypingRequest {
+    string roomId = 1;
+}
+
+// Describes a reaction to a message, e.g. attaching an emoji to it.
+// A reaction is identified by messageId and reaction combined.
+message Reaction {
+
+    // The room where the message is located.
+    string roomId = 1;
+
+    // The message the reaction is for.
+    string messageId = 2;
+
+    // The reaction (e.g. emoji).
+    string reaction = 3;
+
+    // The user that created the reaction.
+    // This field can be omitted when creating a new reaction.
+    optional string userId = 4;
+}
+
+// The order in which a sequence of messages is specified.
+enum MessagesOrder {
+
+    // Request messages in chronological order - latest message comes last
+    Forward = 0;
+
+    // Request messages in anti-chronological order - latest message comes first
+    Backward = 1;
+}
+
+// Request multiple consecutive messages of a room.
+// The request should usually be used paginated, i.e. with a reasonable limit
+// set.
+// The response is expected to be a multi-part response of MessageReceivedEvent's.
+message RoomMessagesRequest {
+
+    // Id of the room for which messages shall be fetched.
+    string roomId = 1;
+
+    // Request messages in chronological or anti-chronological order. If omitted,
+    // the result is expected in anti-chronological (backward) order.
+    optional MessagesOrder order = 2;
+
+    // The result must start at the message that is the immediate successor
+    // to the one specified by this id - if available. If this field is not set,
+    // the result must begin at the latest message if `order=backward` and at
+    // the oldest known message if `order=forward`.
+    optional string fromMessageId = 3;
+
+    // Maximum number of messages that should be contained in the resulting
+    // list. If the toMessageId field is set as well, the resulting list must
+    // be limited at whatever applies first - the toMessageId or the limit.
+    optional uint32 limit = 4;
+}
+
+// Describes a request to search for known users, i.e. accounts registered to
+// the chat backend. Only available if the capability userSearch is available.
+message UserSearchRequest {
+
+    // The search query string.
+    string query = 1;
+
+    // The maximum number of search results that shall be returned.
+    uint32 limit = 2;
+}
+
+// Response to a UserSearchRequest.
+message UserSearchResponse {
+
+    // List of users matching the search query.
+    repeated User userList = 1;
+}
+
+// Describes the presence status of a user, e.g. used for setting the own state
+// by using the according request.
+message UserStatus {
+
+    // The current state of the user. The value "Unknown" is n/a.
+    PresenceState state = 1;
+
+    // Optional free-text status message that other users can see.
+    optional string statusMessage = 2;
+}
+
+// Issue an invite to one or more users to join a chat room.
+// This is only available if the invitations capability is supported.
+// Sending an InvitationRequest without an invitee is insufficient.
+message InvitationRequest {
+
+    // The id of the room the users are invited to.
+    string roomId = 1;
+
+    // The list of ids of users that shall be invited to the room.
+    // Must contain at least one user.
+    repeated string invitees = 2;
+
+    // Free text to display to the invitees together with the invitation.
+    optional string invitationText = 3;
+}
+
+// Received when another user invites this account to a chat room.
+message InvitedEvent {
+
+    // The id of the room this client is invited to.
+    string roomId = 1;
+
+    // Display name of the room.
+    optional string roomDisplayName = 2;
+
+    // Free text to display to the client together with the invitation.
+    optional string invitationText = 3;
+}
+
+// The client's answer to an Invited.
+message InvitedReply {
+
+    // Id of the room to where the client has been invited.
+    string roomId = 1;
+
+    // Whether the invitation is accepted or not. If it is, an update for the
+    // room list is expected.
+    bool accepted = 2;
+}
+
+// Request to create a new room that multiple users can join.
+// Expects a RoomCreatedEvent next.
+message RoomCreateGroupRequest {
+
+    // Optional nice name to display instead of the roomId.
+    // An empty string can be interpreted as no displayName set.
+    optional string displayName = 1;
+
+    // The join rule of the new room.
+    RoomJoinRule joinRule = 2;
+
+    // The IDs of the users who should be invited to the new group room.
+    repeated string invitees = 3;
+
+    // If set, a path to an image file relative to
+    // InitializationRequest.dataRootPath that shall be used as the room
+    // avatar. The image must remain at that path until a RoomChangeEvent
+    // changes it. After that, the callee is free to remove the file.
+    // The caller must ensure that the path is correct and that an image file is
+    // actually at that path.
+    // An empty string is not allowed; the field must not be set at all in that
+    // case.
+    optional string avatarPath = 4;
+}
+
+// Request to create a new room that only one user can join.
+// Expects a RoomCreatedEvent next.
+message RoomCreateDirectRequest {
+
+    // Optional nice name to display instead of the roomId or the other person's
+    // name. An empty string can be interpreted as no displayName set.
+    optional string displayName = 1;
+
+    // The user who should be invited to the new direct room.
+    string invitee = 2;
+
+    // If set, a path to an image file relative to
+    // InitializationRequest.dataRootPath that shall be used as the room
+    // avatar. The image must remain at that path until a RoomChangeEvent
+    // changes it. After that, the callee is free to remove the file.
+    // The caller must ensure that the path is correct and that an image file is
+    // actually at that path.
+    // An empty string is not allowed; the field must not be set at all in that
+    // case.
+    optional string avatarPath = 3;
+}
+
+// Request to edit an already existing room.
+// Expects a RoomChangeEvent next.
+message RoomChangeRequest {
+
+    // The ID of the room to be edited.
+    string roomId = 1;
+
+    // A new display name if it should be changed.
+    optional string displayName = 2;
+
+    // New rule of how this room can be joined.
+    optional RoomJoinRule joinRule = 3;
+
+    // If set flag/unflag the room as favorite.
+    optional bool isFavorite = 4;
+
+    // If set, a path to an image file relative to
+    // InitializationRequest.dataRootPath that shall be used as the new room
+    // avatar. The image must remain at that path until a RoomChangeEvent
+    // changes it. After that, the callee is free to remove the file.
+    // The caller must ensure that the path is correct and that an image file is
+    // actually at that path.
+    // An empty string means that the room avatar shall be removed.
+    optional string avatarPath = 5;
+}
+
+// Request to leave a specific room.
+// Expects a RoomLeftEvent next.
+message RoomLeaveRequest {
+
+    // The ID of the room that should be left.
+    string roomId = 1;
+}
+
+// Event that is raised when the user has left a specific room.
+message RoomLeftEvent {
+
+    enum RoomLeaveReason {
+
+        // The user left the room on their own.
+        User = 0;
+
+        // The user was kicked from the room.
+        // This might also be sent in response to a Knock request if the user
+        // was denied access to the room.
+        Kicked = 1;
+
+        // The user was banned from the room.
+        Banned = 2;
+    }
+
+    // The ID of the room that was left.
+    string roomId = 1;
+
+    // The reason why the room was left.
+    RoomLeaveReason reason = 2;
+
+    // An optional message to be displayed to the user.
+    // This usually contains the reason why the user was kicked or banned from
+    // the room. Might be an empty string if no message is set.
+    optional string message = 3;
+}
+
+// Request to join an existing room that we can join.
+// This means that we are either invited into the room or the room is public.
+// Expects a Room message with full information about the room next, in
+// ResponseContainer.roomCreatedEvent.
+message RoomJoinRequest {
+
+    // The ID of the room that should be joined.
+    string roomId = 1;
+}
+
+// A request to knock on a room to ask members with permission if we may join.
+// A ResponseContainer.roomCreatedEvent with full room information is expected
+// next if the request was exepted, or a RoomLeftEvent if rejected or banned
+// from the room.
+message RoomKnockRequest {
+
+    // The ID of the room that should be knocked.
+    string roomId = 1;
+
+    // An optional message that should be displayed to users receiving the knock
+    // request.
+    optional string message = 2;
+}
+
+// Request a list public rooms.
+message PublicRoomListRequest {
+
+    // The maximum number of public rooms to be returned.
+    optional uint32 limit = 1;
+
+    // A pagniation token from a previous request.
+    optional string since = 2;
+
+    // An optional search term to filter the rooms. Omitting it will request
+    // all public rooms.
+    optional string genericSearchTerm = 3;
+}
+
+// Response to a PublicRoomListRequest.
+message PublicRoomListResponse {
+
+    // The requested list of rooms.
+    repeated PublicRoom roomList = 1;
+
+    // A pagination token to return the next group of rooms.
+    // Use this token in PublicRoomListRequest as the "since" token.
+    optional string nextBatch = 2;
+}
+
+// Describes a public room entity.
+message PublicRoom {
+
+    // The ID of this room.
+    string roomId = 1;
+
+    // The display name of the room.
+    optional string displayName = 2;
+
+    // The number of members inside this room.
+    uint32 numJoinedMembers = 3;
+
+    // The topic of this room.
+    optional string topic = 4;
+
+    // The join rule of this room.
+    RoomJoinRule joinRule = 5;
+}
+
+enum RoomJoinRule {
+
+    // A user who wishes to join the room must first receive an invite
+    // to the room from someone already inside of the room.
+    Invite = 0;
+
+    // Users can join the room if they are invited, or they can request an
+    // invite to the room. They can be allowed or denied access.
+    Knock = 1;
+
+    // Anyone can join the room without any prior action.
+    Public = 2;
+}
