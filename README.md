@@ -8,8 +8,8 @@ Core Rust library for building [GOuda API](https://github.com/gonicus/gouda-prot
 ## Overview
 
 GOuda Core provides an async abstraction layer over the GOuda API, enabling developers to implement
-chat clients in Rust. It defines a [`Client`] trait that implementations must fulfill to handle
-GOuda protocol requests, along with a [`Runner`] that manages the full request-response lifecycle
+chat clients in Rust. It defines a `Client` trait that implementations must fulfill to handle
+GOuda protocol requests, along with a `Runner` that manages the full request-response lifecycle
 including input processing, execution, and output.
 
 For a complete example of a GOuda client using local sockets, see [gouda-matrix](https://github.com/gonicus/gouda-matrix).
@@ -61,7 +61,7 @@ just fmt
 
 ### Implementing a Client
 
-To build a GOuda chat client, implement the [`Client`] trait:
+To build a GOuda chat client, implement the `Client` trait:
 
 ```rust
 use gouda_core::{Client, RequestContext, Result};
@@ -93,7 +93,7 @@ impl Client for MyClient {
 
 ### Running the Runner
 
-The [`Runner`] manages the full lifecycle: reading requests from an input source, executing them
+The `Runner` manages the full lifecycle: reading requests from an input source, executing them
 via your client, and writing responses back.
 
 ```rust
