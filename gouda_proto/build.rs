@@ -27,5 +27,5 @@ fn main() {
         ])
         .out_dir("./src/chat")
         .compile_protos(&["chat.proto"], &[proto_dir])
-        .expect("Failed to compile proto files");
+        .expect("Failed to compile proto files. Did you clone the submodules?");
 }
