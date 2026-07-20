@@ -3,7 +3,10 @@
 use std::env;
 
 fn main() {
-    let build_protos = env::var("BUILD_PROTOS").unwrap_or_default().to_lowercase() == "true";
+    let build_protos = env::var("GOUDA_BUILD_PROTOS")
+        .unwrap_or_default()
+        .to_lowercase()
+        == "true";
 
     if !build_protos {
         return;
