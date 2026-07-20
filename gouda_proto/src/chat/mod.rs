@@ -2,7 +2,7 @@ pub mod builder;
 
 const REDACTED_VALUE: &str = "<REDACTED>";
 
-include!(concat!(env!("OUT_DIR"), "/de.gonicus.gonnect.rs"));
+include!("de.gonicus.gonnect.rs");
 
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

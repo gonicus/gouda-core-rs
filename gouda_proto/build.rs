@@ -1,7 +1,18 @@
 #![allow(clippy::expect_used)]
 
+use std::env;
+
 fn main() {
-    let proto_dir = "./protos";
+    let build_protos = env::var("GOUDA_PROTO_BUILD_PROTOS")
+        .unwrap_or_default()
+        .to_lowercase()
+        == "true";
+
+    if !build_protos {
+        return;
+    }
+
+    let proto_dir = "../protos";
 
     println!("cargo:rerun-if-changed={proto_dir}");
 
@@ -14,6 +25,7 @@ fn main() {
             "CrossSigningMethodSelectedEvent",
             "MessageContentText",
         ])
+        .out_dir("./src/chat")
         .compile_protos(&["chat.proto"], &[proto_dir])
-        .expect("Failed to compile proto files");
+        .expect("Failed to compile proto files. Did you clone the submodules?");
 }
