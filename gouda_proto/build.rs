@@ -1,6 +1,14 @@
 #![allow(clippy::expect_used)]
 
+use std::env;
+
 fn main() {
+    let build_protos = env::var("BUILD_PROTOS").unwrap_or_default().to_lowercase() == "true";
+
+    if !build_protos {
+        return;
+    }
+
     let proto_dir = "./protos";
 
     println!("cargo:rerun-if-changed={proto_dir}");
@@ -14,6 +22,7 @@ fn main() {
             "CrossSigningMethodSelectedEvent",
             "MessageContentText",
         ])
+        .out_dir("./src/chat")
         .compile_protos(&["chat.proto"], &[proto_dir])
         .expect("Failed to compile proto files");
 }
