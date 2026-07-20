@@ -10,7 +10,6 @@ on:
       - 'Cargo.lock'
       - 'rust-toolchain*'
       - '.github/workflows/**'
-      - 'protos/**'
       - 'rustfmt.toml'
 
 name: Rust
@@ -30,16 +29,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - name: Setup cargo cache
         uses: Swatinem/rust-cache@v2
-
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test
         run: cargo test --all --all-features
@@ -54,11 +46,6 @@ jobs:
 
       - name: Setup cargo cache
         uses: Swatinem/rust-cache@v2
-
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install nightly rustfmt
         uses: actions-rs/toolchain@v1
