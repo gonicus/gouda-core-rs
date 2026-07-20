@@ -1,7 +1,7 @@
 #![allow(clippy::expect_used)]
 
 fn main() {
-    let proto_dir = "../protos";
+    let proto_dir = "./protos";
 
     println!("cargo:rerun-if-changed={proto_dir}");
 
