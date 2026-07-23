@@ -29,16 +29,20 @@ This workspace contains the following crates:
 ### Prerequisites
 
 - [Rust](https://www.rust-lang.org/) (latest stable)
-- [Protoc](https://github.com/protocolbuffers/protobuf) (for building protobuf definitions)
+- [Protoc](https://github.com/protocolbuffers/protobuf) (optional, for building protobuf definitions)
 - [just](https://github.com/casey/just) (optional, for running commands via the justfile)
 
 ### Building
 
 ```bash
-# Clone the repository including submodules
-git clone --recursive https://github.com/gonicus/gouda-core-rs.git
+git clone https://github.com/gonicus/gouda-core-rs.git
 cd gouda-core-rs
 cargo build
+```
+
+If you want to update and recompile the proto files, set the environment variable `GOUDA_COMPILE_PROTOS` to `true `during build. Make sure you have cloned all submodules beforehand.
+```bash
+GOUDA_COMPILE_PROTOS=true cargo build
 ```
 
 ### Running Tests
@@ -93,8 +97,8 @@ impl Client for MyClient {
 
 ### Running the Runner
 
-The `Runner` manages the full lifecycle: reading requests from an input source, executing them
-via your client, and writing responses back.
+The `Runner` manages the full lifecycle. Reading requests from an input source, executing them
+via your GOuda client, and writing responses back.
 
 ```rust
 use gouda_core::Runner;
@@ -108,7 +112,7 @@ runner.run().await?;
 ### Sandbox Application
 
 A graphical sandbox application is included for testing and debugging GOuda clients. It provides
-a UI for sending requests and inspecting responses over two local sockets.
+an UI for sending requests and inspecting responses over two local sockets.
 
 ```bash
 cargo run --bin gouda_sandbox <request_socket> <response_socket> [--config <path>]

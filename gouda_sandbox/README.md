@@ -10,7 +10,7 @@ This sandbox app provides a graphical interface for interacting with GOuda clien
 - Test client functionality without a full application frontend
 - Debug protocol-level issues
 
-The app communicates with a GOuda client through two dedicated local sockets — one for sending requests and another for receiving responses.
+The app communicates with a GOuda client through two dedicated local sockets. One for sending requests and another for receiving responses and events.
 
 ## Usage
 
