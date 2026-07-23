@@ -3,6 +3,8 @@
 use std::env;
 
 fn main() {
+    println!("cargo::rerun-if-env-changed=GOUDA_COMPILE_PROTOS");
+
     let build_protos = env::var("GOUDA_COMPILE_PROTOS")
         .unwrap_or_default()
         .to_lowercase();
