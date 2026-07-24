@@ -989,6 +989,9 @@ pub struct MessageChangeEvent {
     /// field is only defined when hasMentionedUserIdsChanged is true.
     #[prost(string, repeated, tag = "9")]
     pub mentioned_user_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Whether the roomMentioned field has changed.
+    #[prost(bool, optional, tag = "13")]
+    pub room_mentioned: ::core::option::Option<bool>,
     /// If set, a new content for the message.
     #[prost(oneof = "message_change_event::Content", tags = "5, 7, 10")]
     pub content: ::core::option::Option<message_change_event::Content>,

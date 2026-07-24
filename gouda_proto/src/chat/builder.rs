@@ -217,6 +217,7 @@ pub struct MessageChangeEventBuilder {
     is_pinned: Option<bool>,
     is_encrypted: Option<bool>,
     mentioned_user_ids: Option<Vec<String>>,
+    room_mentioned: Option<bool>,
     content: Option<message_change_event::Content>,
 }
 
@@ -241,6 +242,11 @@ impl MessageChangeEventBuilder {
 
     pub fn change_mentioned_user_ids(mut self, mentioned_user_ids: Vec<String>) -> Self {
         self.mentioned_user_ids = Some(mentioned_user_ids);
+        self
+    }
+
+    pub fn change_room_mentioned(mut self, room_mentioned: bool) -> Self {
+        self.room_mentioned = Some(room_mentioned);
         self
     }
 
