@@ -217,6 +217,7 @@ pub struct MessageChangeEventBuilder {
     is_pinned: Option<bool>,
     is_encrypted: Option<bool>,
     mentioned_user_ids: Option<Vec<String>>,
+    room_mentioned: Option<bool>,
     content: Option<message_change_event::Content>,
 }
 
@@ -244,6 +245,11 @@ impl MessageChangeEventBuilder {
         self
     }
 
+    pub fn change_room_mentioned(mut self, room_mentioned: bool) -> Self {
+        self.room_mentioned = Some(room_mentioned);
+        self
+    }
+
     pub fn change_content(mut self, content: message_change_event::Content) -> Self {
         self.content = Some(content);
         self
@@ -257,6 +263,7 @@ impl MessageChangeEventBuilder {
             is_encrypted: self.is_encrypted,
             mentioned_user_ids: Vec::new(),
             has_mentioned_user_ids_changed: false,
+            room_mentioned: self.room_mentioned,
             content: self.content,
         };
 
@@ -290,6 +297,7 @@ mod tests {
                 can_invite: false,
                 can_kick: true,
                 can_ban: false,
+                can_mention_room: true,
             }),
             latest_message_timestamp: None,
             avatar_path: Some("avatar-1.png".to_string()),
@@ -312,6 +320,7 @@ mod tests {
                 can_invite: true,
                 can_kick: false,
                 can_ban: true,
+                can_mention_room: false,
             }),
             latest_message_timestamp: None,
             avatar_path: Some("avatar-2.png".to_string()),
@@ -337,6 +346,7 @@ mod tests {
                 can_invite: true,
                 can_kick: false,
                 can_ban: true,
+                can_mention_room: false,
             }),
             avatar_path: Some("avatar-2.png".to_string()),
             is_favourite: Some(false),
@@ -418,6 +428,7 @@ mod tests {
                 can_invite: true,
                 can_kick: false,
                 can_ban: true,
+                can_mention_room: false,
             }),
             avatar_path: Some("avatar-2.png".to_string()),
             is_favourite: Some(false),
@@ -441,6 +452,7 @@ mod tests {
                 can_invite: true,
                 can_kick: false,
                 can_ban: true,
+                can_mention_room: false,
             }),
             avatar_path: Some("avatar-2.png".to_string()),
             is_favorite: Some(false),
@@ -601,6 +613,7 @@ mod tests {
             is_pinned: Some(true),
             is_encrypted: Some(false),
             mentioned_user_ids: Some(vec!["user-1".to_owned(), "user-2".to_owned()]),
+            room_mentioned: Some(true),
             content: Some(message_change_event::Content::Text(MessageContentText {
                 content: "new content".to_owned(),
             })),
@@ -613,6 +626,7 @@ mod tests {
             is_encrypted: Some(false),
             has_mentioned_user_ids_changed: true,
             mentioned_user_ids: vec!["user-1".to_owned(), "user-2".to_owned()],
+            room_mentioned: Some(true),
             content: Some(message_change_event::Content::Text(MessageContentText {
                 content: "new content".to_owned(),
             })),

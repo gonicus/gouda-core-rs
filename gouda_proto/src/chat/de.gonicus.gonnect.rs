@@ -752,6 +752,9 @@ pub struct Message {
     /// Ids of users that have been mentioned in this message.
     #[prost(string, repeated, tag = "13")]
     pub mentioned_user_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// If the entire room was mentioned.
+    #[prost(bool, tag = "16")]
+    pub room_mentioned: bool,
     /// The actual content of the message.
     /// Not specifying the content is not allowed.
     #[prost(oneof = "message::Content", tags = "9, 11, 12")]
@@ -986,6 +989,9 @@ pub struct MessageChangeEvent {
     /// field is only defined when hasMentionedUserIdsChanged is true.
     #[prost(string, repeated, tag = "9")]
     pub mentioned_user_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Whether the roomMentioned field has changed.
+    #[prost(bool, optional, tag = "13")]
+    pub room_mentioned: ::core::option::Option<bool>,
     /// If set, a new content for the message.
     #[prost(oneof = "message_change_event::Content", tags = "5, 7, 10")]
     pub content: ::core::option::Option<message_change_event::Content>,
@@ -1203,6 +1209,9 @@ pub struct RoomPermissions {
     /// The user can ban other users from the room.
     #[prost(bool, tag = "4")]
     pub can_ban: bool,
+    /// The user can mention the entire room in a message.
+    #[prost(bool, tag = "5")]
+    pub can_mention_room: bool,
 }
 /// Informs the client about changes in a single room.
 #[derive(serde::Serialize, serde::Deserialize)]

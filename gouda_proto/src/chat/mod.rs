@@ -187,6 +187,10 @@ impl MessageChangeEvent {
             message.mentioned_user_ids = self.mentioned_user_ids;
         }
 
+        if let Some(room_mentioned) = self.room_mentioned {
+            message.room_mentioned = room_mentioned;
+        }
+
         if let Some(content) = self.content {
             message.content = Some(content.into());
         }
@@ -206,6 +210,7 @@ mod tests {
             can_invite: false,
             can_kick: true,
             can_ban: false,
+            can_mention_room: true,
         });
 
         let event = RoomChangeEvent {
@@ -393,6 +398,7 @@ mod tests {
             is_encrypted: Some(true),
             has_mentioned_user_ids_changed: true,
             mentioned_user_ids: vec!["user-1".to_owned(), "user-2".to_owned()],
+            room_mentioned: Some(true),
             content: Some(message_change_event::Content::Text(MessageContentText {
                 content: "Hello world".to_owned(),
             })),
@@ -408,6 +414,7 @@ mod tests {
             is_encrypted: true,
             reactions: Vec::new(),
             mentioned_user_ids: vec!["user-1".to_owned(), "user-2".to_owned()],
+            room_mentioned: true,
             content: Some(message::Content::Text(MessageContentText {
                 content: "Hello world".to_owned(),
             })),
