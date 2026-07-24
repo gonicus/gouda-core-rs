@@ -893,6 +893,9 @@ pub struct MessageSendRequest {
     /// Ids of users that have been mentioned in this message.
     #[prost(string, repeated, tag = "6")]
     pub mentioned_user_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// If the entire room has been mentioned.
+    #[prost(bool, tag = "9")]
+    pub room_mentioned: bool,
     /// The actual content of the message.
     /// This field must not be empty.
     #[prost(oneof = "message_send_request::Content", tags = "3, 5")]
@@ -941,6 +944,9 @@ pub struct MessageChangeRequest {
     /// field is only defined when hasMentionedUserIdsChanged is true.
     #[prost(string, repeated, tag = "8")]
     pub mentioned_user_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Whether the roomMentioned field has changed.
+    #[prost(bool, optional, tag = "13")]
+    pub room_mentioned: ::core::option::Option<bool>,
     /// The new content of the message.
     /// This field must not be empty. In order to remove a message, a
     /// MessageRemoveRequest must be made.

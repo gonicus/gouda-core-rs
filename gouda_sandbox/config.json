@@ -116,7 +116,8 @@
     "content": { "Text": {
         "content": "Hello world!"
     }},
-    "mentioned_user_ids": []
+    "mentioned_user_ids": [],
+    "room_mentioned": false
   },
   "remove-message": {
     "room_id": "<ROOM_ID>",
@@ -129,7 +130,8 @@
         "content": "Hello world!"
     }},
     "has_mentioned_user_ids_changed": false,
-    "mentioned_user_ids": []
+    "mentioned_user_ids": [],
+    "room_mentioned": false
   },
   "create-reaction": {
     "room_id": "<ROOM_ID>",

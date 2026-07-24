@@ -389,6 +389,7 @@ impl InputUi for MessageSendRequest {
         input_attribute!(self, ui, room_id);
         input_attribute!(self, ui, related_message_id);
         input_attribute!(self, ui, mentioned_user_ids);
+        input_attribute!(self, ui, room_mentioned);
         input_attribute!(self, ui, content);
     }
 }
@@ -406,6 +407,7 @@ impl InputUi for MessageChangeRequest {
         input_attribute!(self, ui, message_id);
         input_attribute!(self, ui, has_mentioned_user_ids_changed);
         input_attribute!(self, ui, mentioned_user_ids);
+        input_attribute!(self, ui, room_mentioned);
         input_attribute!(self, ui, content);
     }
 }
