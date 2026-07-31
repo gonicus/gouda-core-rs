@@ -2226,6 +2226,7 @@ mod tests {
                     avatar_path: None,
                     is_favorite: false,
                     room_settings: None,
+                    invitation_text: None,
                 },
                 Room {
                     room_id: "room-2".to_owned(),
@@ -2243,6 +2244,7 @@ mod tests {
                     avatar_path: None,
                     is_favorite: false,
                     room_settings: None,
+                    invitation_text: None,
                 },
             ],
         };
@@ -2354,6 +2356,7 @@ mod tests {
             avatar_path: None,
             is_favorite: false,
             room_settings: None,
+            invitation_text: None,
         };
 
         let client = ClientMock::new().create_group_room_response(Ok(response.clone()));
@@ -2463,6 +2466,7 @@ mod tests {
             avatar_path: None,
             is_favorite: false,
             room_settings: None,
+            invitation_text: None,
         };
 
         let client = ClientMock::new().create_direct_room_response(Ok(response.clone()));
@@ -2779,6 +2783,7 @@ mod tests {
             avatar_path: None,
             is_favorite: false,
             room_settings: None,
+            invitation_text: None,
         };
 
         let client = ClientMock::new().join_room_response(Ok(response.clone()));

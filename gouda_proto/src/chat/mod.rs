@@ -246,6 +246,7 @@ mod tests {
             room_settings: Some(RoomSettings {
                 notification_setting: Some(NotificationSetting::AllMessages.into()),
             }),
+            invitation_text: None,
         };
 
         let mut room = Room {
@@ -418,6 +419,7 @@ mod tests {
             content: Some(message::Content::Text(MessageContentText {
                 content: "Hello world".to_owned(),
             })),
+            thread_id: None,
         };
 
         let mut message = Message {

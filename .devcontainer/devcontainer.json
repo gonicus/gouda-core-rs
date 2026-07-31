@@ -4,7 +4,10 @@
     "dockerfile": "Dockerfile"
   },
   "remoteUser": "dev",
-	"containerUser": "dev",
+  "containerUser": "dev",
+  "remoteEnv": {
+    "GOUDA_COMPILE_PROTOS": "true"
+  },
   "customizations": {
     "zed": {
       "extensions": [

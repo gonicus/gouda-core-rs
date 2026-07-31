@@ -305,6 +305,7 @@ mod tests {
             room_settings: Some(RoomSettings {
                 notification_setting: Some(NotificationSetting::AllMessages.into()),
             }),
+            invitation_text: None,
         };
 
         let new = Room {
@@ -328,6 +329,7 @@ mod tests {
             room_settings: Some(RoomSettings {
                 notification_setting: Some(NotificationSetting::Mute.into()),
             }),
+            invitation_text: Some("Some Invitation".to_owned()),
         };
 
         let expected = RoomChangeEventBuilder {
