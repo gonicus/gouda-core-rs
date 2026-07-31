@@ -246,6 +246,8 @@ pub mod error {
         MessageSizeLimitExceeded = 18,
         /// The size limit of a media upload has been exceeded.
         UploadSizeLimitExceeded = 19,
+        /// The thread with the given ID was not found.
+        ThreadNotFound = 20,
     }
     impl ErrorType {
         /// String value of the enum field names used in the ProtoBuf definition.
@@ -274,6 +276,7 @@ pub mod error {
                 Self::UserNotFound => "UserNotFound",
                 Self::MessageSizeLimitExceeded => "MessageSizeLimitExceeded",
                 Self::UploadSizeLimitExceeded => "UploadSizeLimitExceeded",
+                Self::ThreadNotFound => "ThreadNotFound",
             }
         }
         /// Creates an enum from field names used in the ProtoBuf definition.
@@ -299,6 +302,7 @@ pub mod error {
                 "UserNotFound" => Some(Self::UserNotFound),
                 "MessageSizeLimitExceeded" => Some(Self::MessageSizeLimitExceeded),
                 "UploadSizeLimitExceeded" => Some(Self::UploadSizeLimitExceeded),
+                "ThreadNotFound" => Some(Self::ThreadNotFound),
                 _ => None,
             }
         }
@@ -755,6 +759,9 @@ pub struct Message {
     /// If the entire room was mentioned.
     #[prost(bool, tag = "16")]
     pub room_mentioned: bool,
+    /// The ID of the thread, if the message was send within a thread.
+    #[prost(string, optional, tag = "17")]
+    pub thread_id: ::core::option::Option<::prost::alloc::string::String>,
     /// The actual content of the message.
     /// Not specifying the content is not allowed.
     #[prost(oneof = "message::Content", tags = "9, 11, 12")]
@@ -896,6 +903,9 @@ pub struct MessageSendRequest {
     /// If the entire room has been mentioned.
     #[prost(bool, tag = "9")]
     pub room_mentioned: bool,
+    /// The ID of the thread, if the message should be send within a thread.
+    #[prost(string, optional, tag = "10")]
+    pub thread_id: ::core::option::Option<::prost::alloc::string::String>,
     /// The actual content of the message.
     /// This field must not be empty.
     #[prost(oneof = "message_send_request::Content", tags = "3, 5")]
@@ -1196,6 +1206,10 @@ pub struct Room {
     /// Room-specific settings
     #[prost(message, optional, tag = "12")]
     pub room_settings: ::core::option::Option<RoomSettings>,
+    /// Optional invitation text if the user is invited but has not joined the
+    /// room yet.
+    #[prost(string, optional, tag = "13")]
+    pub invitation_text: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Defines single points of authorization for a room that may or may not be done
 /// by this client's user.
