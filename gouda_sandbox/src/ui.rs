@@ -390,6 +390,7 @@ impl InputUi for MessageSendRequest {
         input_attribute!(self, ui, related_message_id);
         input_attribute!(self, ui, mentioned_user_ids);
         input_attribute!(self, ui, room_mentioned);
+        input_attribute!(self, ui, thread_id);
         input_attribute!(self, ui, content);
     }
 }

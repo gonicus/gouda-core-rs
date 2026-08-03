@@ -117,7 +117,8 @@
         "content": "Hello world!"
     }},
     "mentioned_user_ids": [],
-    "room_mentioned": false
+    "room_mentioned": false,
+    "thread_id": null
   },
   "remove-message": {
     "room_id": "<ROOM_ID>",
