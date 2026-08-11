@@ -66,6 +66,10 @@ impl RoomChangeEventBuilder {
             obj = obj.change_room_settings(new.room_settings.unwrap_or_default());
         }
 
+        if old.pinned_messages != new.pinned_messages {
+            obj = obj.change_pinned_messages(new.pinned_messages.clone());
+        }
+
         obj
     }
 

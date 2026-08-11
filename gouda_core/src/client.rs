@@ -261,6 +261,16 @@ pub trait Client: Send + Sync {
         not_implemented_error()
     }
 
+    /// Pin or unpin a message from a room.
+    #[allow(unused_variables)]
+    async fn pin_unpin_message(
+        &self,
+        ctx: RequestContext,
+        request: RoomPinRequest,
+    ) -> Result<RoomChangeEvent> {
+        not_implemented_error()
+    }
+
     /// Send a message to a room.
     #[allow(unused_variables)]
     async fn send_message(
