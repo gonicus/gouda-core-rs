@@ -57,6 +57,7 @@ pub enum Action {
     RoomMessages(Box<RoomMessagesRequest>),
     MarkAsRead(Box<RoomMarkAsReadRequest>),
     ActivateTypingNotice(Box<RoomTypingRequest>),
+    PinMessage(Box<RoomPinRequest>),
     SendMessage(Box<MessageSendRequest>),
     RemoveMessage(Box<MessageRemoveRequest>),
     ChangeMessage(Box<MessageChangeRequest>),
@@ -97,6 +98,7 @@ impl Action {
             Self::RoomMessages(request) => run_room_messages(tag, *request),
             Self::MarkAsRead(request) => run_mark_as_read(tag, *request),
             Self::ActivateTypingNotice(request) => run_activate_typing_notice(tag, *request),
+            Self::PinMessage(request) => run_pin_message(tag, *request),
             Self::SendMessage(request) => run_send_message(tag, *request),
             Self::RemoveMessage(request) => run_remove_message(tag, *request),
             Self::ChangeMessage(request) => run_change_message(tag, *request),
@@ -137,6 +139,7 @@ impl InputUi for Action {
             Self::RoomMessages(request) => request.update(ui),
             Self::MarkAsRead(request) => request.update(ui),
             Self::ActivateTypingNotice(request) => request.update(ui),
+            Self::PinMessage(request) => request.update(ui),
             Self::SendMessage(request) => request.update(ui),
             Self::RemoveMessage(request) => request.update(ui),
             Self::ChangeMessage(request) => request.update(ui),
@@ -223,6 +226,7 @@ impl_to_container!(
     RoomTypingRequest,
     RoomTypingRequest
 );
+impl_to_container!(run_pin_message, RoomPinRequest, RoomPinRequest);
 impl_to_container!(run_send_message, MessageSendRequest, MessageSendRequest);
 impl_to_container!(
     run_remove_message,
