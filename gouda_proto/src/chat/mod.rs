@@ -146,6 +146,10 @@ impl RoomChangeEvent {
         if let Some(settings) = self.room_settings {
             room.room_settings = Some(settings);
         }
+
+        if self.has_pinned_messages_changed {
+            room.pinned_messages = self.pinned_messages;
+        }
     }
 }
 
@@ -229,6 +233,8 @@ mod tests {
             room_settings: Some(RoomSettings {
                 notification_setting: Some(NotificationSetting::AllMessages.into()),
             }),
+            has_pinned_messages_changed: true,
+            pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
         };
 
         let expected = Room {
@@ -247,6 +253,7 @@ mod tests {
                 notification_setting: Some(NotificationSetting::AllMessages.into()),
             }),
             invitation_text: None,
+            pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
         };
 
         let mut room = Room {

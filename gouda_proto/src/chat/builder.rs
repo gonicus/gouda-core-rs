@@ -16,6 +16,7 @@ pub struct RoomChangeEventBuilder {
     avatar_path: Option<String>,
     is_favourite: Option<bool>,
     room_settings: Option<RoomSettings>,
+    pinned_messages: Option<Vec<String>>,
 }
 
 impl RoomChangeEventBuilder {
@@ -63,6 +64,10 @@ impl RoomChangeEventBuilder {
 
         if old.room_settings != new.room_settings {
             obj = obj.change_room_settings(new.room_settings.unwrap_or_default());
+        }
+
+        if old.pinned_messages != new.pinned_messages {
+            obj = obj.change_pinned_messages(new.pinned_messages.clone());
         }
 
         obj
@@ -118,6 +123,11 @@ impl RoomChangeEventBuilder {
         self
     }
 
+    pub fn change_pinned_messages(mut self, pinned_messages: Vec<String>) -> Self {
+        self.pinned_messages = Some(pinned_messages);
+        self
+    }
+
     pub fn to_proto(self) -> RoomChangeEvent {
         let mut event = RoomChangeEvent {
             room_id: self.room_id,
@@ -133,6 +143,8 @@ impl RoomChangeEventBuilder {
             avatar_path: self.avatar_path,
             is_favorite: self.is_favourite,
             room_settings: self.room_settings,
+            has_pinned_messages_changed: false,
+            pinned_messages: Vec::new(),
         };
 
         if let Some(user_id_list) = self.user_id_list {
@@ -143,6 +155,11 @@ impl RoomChangeEventBuilder {
         if let Some(typing_user_id_list) = self.typing_user_id_list {
             event.has_typing_user_id_list_changed = true;
             event.typing_user_id_list = typing_user_id_list;
+        }
+
+        if let Some(pinned_messages) = self.pinned_messages {
+            event.has_pinned_messages_changed = true;
+            event.pinned_messages = pinned_messages;
         }
 
         event
@@ -306,6 +323,7 @@ mod tests {
                 notification_setting: Some(NotificationSetting::AllMessages.into()),
             }),
             invitation_text: None,
+            pinned_messages: vec!["message-1".to_owned()],
         };
 
         let new = Room {
@@ -330,6 +348,7 @@ mod tests {
                 notification_setting: Some(NotificationSetting::Mute.into()),
             }),
             invitation_text: Some("Some Invitation".to_owned()),
+            pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
         };
 
         let expected = RoomChangeEventBuilder {
@@ -355,6 +374,7 @@ mod tests {
             room_settings: Some(RoomSettings {
                 notification_setting: Some(NotificationSetting::Mute.into()),
             }),
+            pinned_messages: Some(vec!["message-1".to_owned(), "message-2".to_owned()]),
         };
 
         let result = RoomChangeEventBuilder::compare_rooms(&old, &new);
@@ -437,6 +457,7 @@ mod tests {
             room_settings: Some(RoomSettings {
                 notification_setting: Some(NotificationSetting::Mute.into()),
             }),
+            pinned_messages: Some(vec!["message-1".to_owned(), "message-2".to_owned()]),
         };
 
         let expected = RoomChangeEvent {
@@ -461,6 +482,8 @@ mod tests {
             room_settings: Some(RoomSettings {
                 notification_setting: Some(NotificationSetting::Mute.into()),
             }),
+            has_pinned_messages_changed: true,
+            pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
         };
 
         let result = builder.to_proto();

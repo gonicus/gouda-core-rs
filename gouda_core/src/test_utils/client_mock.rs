@@ -129,6 +129,9 @@ pub struct ClientMock {
     activate_typing_notice_response: Mutex<Result<()>>,
     activate_typing_notice_call_count: Mutex<u32>,
 
+    pin_unpin_message_response: Mutex<Result<RoomChangeEvent>>,
+    pin_unpin_message_call_count: Mutex<u32>,
+
     send_message_response: Mutex<Result<MessageSendResponse>>,
     send_message_call_count: Mutex<u32>,
 
@@ -472,6 +475,17 @@ impl ClientMock {
     /// Assert [`Self::activate_typing_notice`] was called `n` times.
     pub fn assert_activate_typing_notice_called_n(&self, n: u32) {
         assert!(*self.activate_typing_notice_call_count.lock().unwrap() == n);
+    }
+
+    /// The response [`Self::pin_unpin_message`] should return.
+    pub fn pin_unpin_message_response(mut self, response: crate::Result<RoomChangeEvent>) -> Self {
+        self.pin_unpin_message_response = Mutex::new(response.into());
+        self
+    }
+
+    /// Assert [`Self::pin_unpin_message`] was called `n` times.
+    pub fn assert_pin_unpin_message_called_n(&self, n: u32) {
+        assert!(*self.pin_unpin_message_call_count.lock().unwrap() == n);
     }
 
     /// The response [`Self::send_message`] should return.
@@ -854,6 +868,20 @@ impl Client for ClientMock {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.activate_typing_notice_call_count.lock().unwrap() += 1;
         self.activate_typing_notice_response
+            .lock()
+            .unwrap()
+            .clone()
+            .into()
+    }
+
+    async fn pin_unpin_message(
+        &self,
+        ctx: RequestContext,
+        _request: RoomPinRequest,
+    ) -> crate::Result<RoomChangeEvent> {
+        *self.received_ctx.lock().unwrap() = Some(ctx);
+        *self.pin_unpin_message_call_count.lock().unwrap() += 1;
+        self.pin_unpin_message_response
             .lock()
             .unwrap()
             .clone()

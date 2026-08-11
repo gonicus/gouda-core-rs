@@ -12,7 +12,7 @@ pub struct RequestContainer {
     /// The payload; one of these requests.
     #[prost(
         oneof = "request_container::Content",
-        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 33, 12, 13, 32, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 34, 26, 27, 28, 29, 30, 31"
+        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 33, 12, 13, 32, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 34, 35, 26, 27, 28, 29, 30, 31"
     )]
     pub content: ::core::option::Option<request_container::Content>,
 }
@@ -76,6 +76,8 @@ pub mod request_container {
         RoomMarkAsReadRequest(super::RoomMarkAsReadRequest),
         #[prost(message, tag = "34")]
         RoomTypingRequest(super::RoomTypingRequest),
+        #[prost(message, tag = "35")]
+        RoomPinRequest(super::RoomPinRequest),
         #[prost(message, tag = "26")]
         MessageSendRequest(super::MessageSendRequest),
         #[prost(message, tag = "27")]
@@ -1210,6 +1212,9 @@ pub struct Room {
     /// room yet.
     #[prost(string, optional, tag = "13")]
     pub invitation_text: ::core::option::Option<::prost::alloc::string::String>,
+    /// The ID of messages pinned to the room.
+    #[prost(string, repeated, tag = "14")]
+    pub pinned_messages: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Defines single points of authorization for a room that may or may not be done
 /// by this client's user.
@@ -1286,6 +1291,14 @@ pub struct RoomChangeEvent {
     /// contain all of the room settings, even those which have not changed.
     #[prost(message, optional, tag = "13")]
     pub room_settings: ::core::option::Option<RoomSettings>,
+    /// If the pinnedMessages have changed with this event.
+    /// If false, the pinnedMessages have not changed and only contain a
+    /// default value that should not be used.
+    #[prost(bool, tag = "14")]
+    pub has_pinned_messages_changed: bool,
+    /// The ID of messages pinned to the room.
+    #[prost(string, repeated, tag = "15")]
+    pub pinned_messages: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Notify the client that messages and notifications in this room have been
 /// read by the user.
@@ -1302,6 +1315,21 @@ pub struct RoomMarkAsReadRequest {
 pub struct RoomTypingRequest {
     #[prost(string, tag = "1")]
     pub room_id: ::prost::alloc::string::String,
+}
+/// Pin or unpin an existing message to or from a room.
+/// Expects a RoomChangeEvent afterwards.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct RoomPinRequest {
+    /// The ID of the room the message should be pinned to.
+    #[prost(string, tag = "1")]
+    pub room_id: ::prost::alloc::string::String,
+    /// The ID of the message to pin.
+    #[prost(string, tag = "2")]
+    pub message_id: ::prost::alloc::string::String,
+    /// If the message should be pinned or unpinned.
+    #[prost(bool, tag = "3")]
+    pub pinned: bool,
 }
 /// Describes a reaction to a message, e.g. attaching an emoji to it.
 /// A reaction is identified by messageId and reaction combined.

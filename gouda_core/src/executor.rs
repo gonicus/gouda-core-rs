@@ -290,6 +290,11 @@ impl RequestProcessor {
                     self.send_result(tag, Err(err)).await?;
                 }
             }
+            RequestContent::RoomPinRequest(request) => {
+                let result = self.client.pin_unpin_message(ctx, request).await;
+                self.send_result(tag, result.map(ResponseContent::RoomChangeEvent))
+                    .await?;
+            }
             RequestContent::MessageSendRequest(request) => {
                 let result = self.client.send_message(ctx, request).await;
                 self.send_result(tag, result.map(ResponseContent::MessageSendResponse))
@@ -2030,6 +2035,8 @@ mod tests {
             avatar_path: None,
             is_favorite: None,
             room_settings: None,
+            has_pinned_messages_changed: false,
+            pinned_messages: Vec::new(),
         };
 
         let client = ClientMock::new().invite_response(Ok(response.clone()));
@@ -2227,6 +2234,7 @@ mod tests {
                     is_favorite: false,
                     room_settings: None,
                     invitation_text: None,
+                    pinned_messages: Vec::new(),
                 },
                 Room {
                     room_id: "room-2".to_owned(),
@@ -2245,6 +2253,7 @@ mod tests {
                     is_favorite: false,
                     room_settings: None,
                     invitation_text: None,
+                    pinned_messages: Vec::new(),
                 },
             ],
         };
@@ -2357,6 +2366,7 @@ mod tests {
             is_favorite: false,
             room_settings: None,
             invitation_text: None,
+            pinned_messages: Vec::new(),
         };
 
         let client = ClientMock::new().create_group_room_response(Ok(response.clone()));
@@ -2467,6 +2477,7 @@ mod tests {
             is_favorite: false,
             room_settings: None,
             invitation_text: None,
+            pinned_messages: Vec::new(),
         };
 
         let client = ClientMock::new().create_direct_room_response(Ok(response.clone()));
@@ -2577,6 +2588,8 @@ mod tests {
             avatar_path: None,
             is_favorite: None,
             room_settings: None,
+            has_pinned_messages_changed: false,
+            pinned_messages: Vec::new(),
         };
 
         let client = ClientMock::new().change_room_response(Ok(response.clone()));
@@ -2784,6 +2797,7 @@ mod tests {
             is_favorite: false,
             room_settings: None,
             invitation_text: None,
+            pinned_messages: Vec::new(),
         };
 
         let client = ClientMock::new().join_room_response(Ok(response.clone()));
@@ -3062,6 +3076,8 @@ mod tests {
             avatar_path: None,
             is_favorite: None,
             room_settings: None,
+            has_pinned_messages_changed: false,
+            pinned_messages: Vec::new(),
         };
 
         let client = ClientMock::new().mark_as_read_response(Ok(response.clone()));
@@ -3223,6 +3239,118 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_activate_typing_notice_called_n(1);
+        client.assert_received_response(ResponseContainer {
+            tag: 2,
+            content: Some(ResponseContent::Error(response.clone())),
+        });
+
+        assert_eq!(
+            output_rx.recv().await.unwrap(),
+            create_output_task(2, ResponseContent::Error(response))
+        );
+        assert!(output_rx.is_empty())
+    }
+
+    #[tokio::test]
+    async fn test_room_pin_request() {
+        // Arrange
+        let request = RequestContent::RoomPinRequest(RoomPinRequest::default());
+        let response = RoomChangeEvent {
+            room_id: "new-room".to_owned(),
+            has_typing_user_id_list_changed: true,
+            has_user_id_list_changed: false,
+            user_id_list: HashMap::from([
+                ("user-1".to_owned(), UserRoomState::Joined as i32),
+                ("user-4".to_owned(), UserRoomState::Joined as i32),
+            ]),
+            typing_user_id_list: Vec::new(),
+            display_name: None,
+            unread_count: Some(0),
+            join_rule: None,
+            is_direct: None,
+            permissions: None,
+            avatar_path: None,
+            is_favorite: None,
+            room_settings: None,
+            has_pinned_messages_changed: false,
+            pinned_messages: Vec::new(),
+        };
+
+        let client = ClientMock::new().pin_unpin_message_response(Ok(response.clone()));
+
+        let (executor_tx, executor_rx) = mpsc::channel(64);
+        let (output_tx, mut output_rx) = mpsc::channel(64);
+
+        let executor = Executor::new(
+            Arc::new(client),
+            executor_rx,
+            executor_tx.clone(),
+            output_tx,
+        );
+
+        // Act
+        executor_tx
+            .try_send(create_executor_task(2, request))
+            .unwrap();
+        executor_tx.try_send(ExecutorTask::Exit).unwrap();
+
+        let Executor { client, .. } = executor
+            .run(CancellationToken::new())
+            .await
+            .unwrap()
+            .unwrap();
+
+        // Assert
+        let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
+        client.assert_pin_unpin_message_called_n(1);
+        client.assert_received_response(ResponseContainer {
+            tag: 2,
+            content: Some(ResponseContent::RoomChangeEvent(response.clone())),
+        });
+
+        assert_eq!(
+            output_rx.recv().await.unwrap(),
+            create_output_task(2, ResponseContent::RoomChangeEvent(response))
+        );
+        assert!(output_rx.is_empty())
+    }
+
+    #[tokio::test]
+    async fn test_room_pin_request_err() {
+        // Arrange
+        let request = RequestContent::RoomPinRequest(RoomPinRequest::default());
+        let response = Error {
+            r#type: ErrorType::Unknown as i32,
+            error_string: Some("Test error".to_owned()),
+        };
+
+        let client = ClientMock::new().pin_unpin_message_response(Err(response.clone()));
+
+        let (executor_tx, executor_rx) = mpsc::channel(64);
+        let (output_tx, mut output_rx) = mpsc::channel(64);
+
+        let executor = Executor::new(
+            Arc::new(client),
+            executor_rx,
+            executor_tx.clone(),
+            output_tx,
+        );
+
+        // Act
+        executor_tx
+            .try_send(create_executor_task(2, request))
+            .unwrap();
+        executor_tx.try_send(ExecutorTask::Exit).unwrap();
+
+        let Executor { client, .. } = executor
+            .run(CancellationToken::new())
+            .await
+            .unwrap()
+            .unwrap();
+
+        // Assert
+        let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
+        client.assert_pin_unpin_message_called_n(1);
         client.assert_received_response(ResponseContainer {
             tag: 2,
             content: Some(ResponseContent::Error(response.clone())),
