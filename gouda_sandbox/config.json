@@ -111,6 +111,11 @@
   "activate-typing-notice": {
     "room_id": "<ROOM_ID>"
   },
+  "pin-message": {
+    "room_id": "<ROOM_ID>",
+    "message_id": "<MESSAGE_ID>",
+    "pinned": true
+  },
   "send-message": {
     "room_id": "<ROOM_ID>",
     "content": { "Text": {

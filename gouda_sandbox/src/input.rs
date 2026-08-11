@@ -151,6 +151,7 @@ impl InputWindow {
                     ActivateTypingNotice,
                     ctx.config().activate_typing_notice.clone()
                 );
+                ui_action!(self, ui, PinMessage, ctx.config().pin_message.clone());
                 ui_action!(self, ui, SendMessage, ctx.config().send_message.clone());
                 ui_action!(self, ui, RemoveMessage, ctx.config().remove_message.clone());
                 ui_action!(self, ui, ChangeMessage, ctx.config().change_message.clone());

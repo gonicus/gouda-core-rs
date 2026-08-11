@@ -282,6 +282,14 @@ impl InputUi for RoomTypingRequest {
     }
 }
 
+impl InputUi for RoomPinRequest {
+    fn update(&mut self, ui: &mut egui::Ui) {
+        input_attribute!(self, ui, room_id);
+        input_attribute!(self, ui, message_id);
+        input_attribute!(self, ui, pinned);
+    }
+}
+
 impl InputUi for message_send_request::Content {
     fn update(&mut self, ui: &mut egui::Ui) {
         let text = match self {

@@ -31,6 +31,7 @@ pub struct Config {
     pub room_messages: RoomMessagesRequest,
     pub mark_as_read: RoomMarkAsReadRequest,
     pub activate_typing_notice: RoomTypingRequest,
+    pub pin_message: RoomPinRequest,
     pub send_message: MessageSendRequest,
     pub remove_message: MessageRemoveRequest,
     pub change_message: MessageChangeRequest,
