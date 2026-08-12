@@ -215,6 +215,7 @@ mod tests {
             can_kick: true,
             can_ban: false,
             can_mention_room: true,
+            can_pin_messages: false,
         });
 
         let event = RoomChangeEvent {

@@ -1237,6 +1237,9 @@ pub struct RoomPermissions {
     /// The user can mention the entire room in a message.
     #[prost(bool, tag = "5")]
     pub can_mention_room: bool,
+    /// The user can pin messages in a room.
+    #[prost(bool, tag = "6")]
+    pub can_pin_messages: bool,
 }
 /// Informs the client about changes in a single room.
 #[derive(serde::Serialize, serde::Deserialize)]
