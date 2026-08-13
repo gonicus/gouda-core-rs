@@ -64,6 +64,7 @@ pub enum Action {
     CreateReaction(Box<Reaction>),
     RemoveReaction(Box<Reaction>),
     GetMessage(Box<MessageRequest>),
+    AnswerPoll(Box<PollAnswerRequest>),
 }
 
 impl Action {
@@ -105,6 +106,7 @@ impl Action {
             Self::CreateReaction(request) => run_create_reaction(tag, *request),
             Self::RemoveReaction(request) => run_remove_reaction(tag, *request),
             Self::GetMessage(request) => run_get_message(tag, *request),
+            Self::AnswerPoll(request) => run_answer_poll(tag, *request),
         }
     }
 }
@@ -146,6 +148,7 @@ impl InputUi for Action {
             Self::CreateReaction(request) => request.update(ui),
             Self::RemoveReaction(request) => request.update(ui),
             Self::GetMessage(request) => request.update(ui),
+            Self::AnswerPoll(request) => request.update(ui),
         }
     }
 }
@@ -241,3 +244,4 @@ impl_to_container!(
 impl_to_container!(run_create_reaction, CreateReactionRequest, Reaction);
 impl_to_container!(run_remove_reaction, RemoveReactionRequest, Reaction);
 impl_to_container!(run_get_message, MessageRequest, MessageRequest);
+impl_to_container!(run_answer_poll, PollAnswerRequest, PollAnswerRequest);

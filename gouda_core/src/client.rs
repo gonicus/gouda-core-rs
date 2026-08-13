@@ -319,6 +319,16 @@ pub trait Client: Send + Sync {
         not_implemented_error()
     }
 
+    /// Answers a poll.
+    #[allow(unused_variables)]
+    async fn answer_poll(
+        &self,
+        ctx: RequestContext,
+        request: PollAnswerRequest,
+    ) -> Result<MessageChangeEvent> {
+        not_implemented_error()
+    }
+
     /// This method is currently used only for testing purposes to downcast a `dyn Client`.
     /// Implement this method as follows:
     /// ```ignore

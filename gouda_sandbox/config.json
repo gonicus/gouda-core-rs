@@ -154,5 +154,11 @@
   "get-message": {
     "room_id": "<ROOM_ID>",
     "message_id": "<MESSAGE_ID>"
+  },
+  "answer-poll": {
+    "room_id": "<ROOM_ID>",
+    "message_id": "<MESSAGE_ID>",
+    "option_id": "<OPTION_ID>",
+    "selected": true
   }
 }

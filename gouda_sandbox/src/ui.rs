@@ -295,6 +295,7 @@ impl InputUi for message_send_request::Content {
         let text = match self {
             Self::Text(_) => "Text",
             Self::File(_) => "File",
+            Self::Poll(_) => "Poll",
         };
 
         ui.vertical(|ui| {
@@ -308,6 +309,7 @@ impl InputUi for message_send_request::Content {
             match self {
                 Self::Text(content) => content.update(ui),
                 Self::File(content) => content.update(ui),
+                Self::Poll(content) => content.update(ui),
             }
         });
     }
@@ -323,6 +325,7 @@ impl InputUi for message_change_event::Content {
             Self::Text(_) => "Text",
             Self::File(_) => "File",
             Self::MembershipChange(_) => "MembershipChange",
+            Self::Poll(_) => "Poll",
         };
 
         ui.vertical(|ui| {
@@ -337,6 +340,7 @@ impl InputUi for message_change_event::Content {
                 Self::Text(content) => content.update(ui),
                 Self::File(content) => content.update(ui),
                 Self::MembershipChange(content) => content.update(ui),
+                Self::Poll(content) => content.update(ui),
             }
         });
     }
@@ -351,6 +355,7 @@ impl InputUi for message_change_request::Content {
         let text = match self {
             Self::Text(_) => "Text",
             Self::File(_) => "File",
+            Self::Poll(_) => "Poll",
         };
 
         ui.vertical(|ui| {
@@ -364,6 +369,7 @@ impl InputUi for message_change_request::Content {
             match self {
                 Self::Text(content) => content.update(ui),
                 Self::File(content) => content.update(ui),
+                Self::Poll(content) => content.update(ui),
             }
         });
     }
@@ -389,6 +395,24 @@ impl InputUi for MessageContentFile {
 impl InputUi for MessageContentMembershipChange {
     fn update(&mut self, ui: &mut egui::Ui) {
         input_attribute!(self, ui, change);
+    }
+}
+
+impl InputUi for PollOption {
+    fn update(&mut self, ui: &mut egui::Ui) {
+        input_attribute!(self, ui, id);
+        input_attribute!(self, ui, text);
+        input_attribute!(self, ui, voted_user_ids);
+    }
+}
+
+impl InputUi for MessageContentPoll {
+    fn update(&mut self, ui: &mut egui::Ui) {
+        input_attribute!(self, ui, r#type);
+        input_attribute!(self, ui, completed);
+        input_attribute!(self, ui, max_selections);
+        input_attribute!(self, ui, question);
+        input_attribute!(self, ui, options);
     }
 }
 
@@ -434,5 +458,14 @@ impl InputUi for MessageRequest {
     fn update(&mut self, ui: &mut egui::Ui) {
         input_attribute!(self, ui, room_id);
         input_attribute!(self, ui, message_id);
+    }
+}
+
+impl InputUi for PollAnswerRequest {
+    fn update(&mut self, ui: &mut egui::Ui) {
+        input_attribute!(self, ui, room_id);
+        input_attribute!(self, ui, message_id);
+        input_attribute!(self, ui, option_id);
+        input_attribute!(self, ui, selected);
     }
 }

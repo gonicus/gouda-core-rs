@@ -168,6 +168,7 @@ impl InputWindow {
                     ctx.config().remove_reaction.clone()
                 );
                 ui_action!(self, ui, GetMessage, ctx.config().get_message.clone());
+                ui_action!(self, ui, AnswerPoll, ctx.config().answer_poll.clone());
             });
     }
 }
