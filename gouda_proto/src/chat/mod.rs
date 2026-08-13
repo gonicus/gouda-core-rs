@@ -179,10 +179,6 @@ impl UserChangeEvent {
 
 impl MessageChangeEvent {
     pub fn update_into_message(self, message: &mut Message) {
-        if let Some(is_pinned) = self.is_pinned {
-            message.is_pinned = is_pinned;
-        }
-
         if let Some(is_encrypted) = self.is_encrypted {
             message.is_encrypted = is_encrypted;
         }
@@ -403,7 +399,6 @@ mod tests {
         let event = MessageChangeEvent {
             room_id: "room-1".to_owned(),
             message_id: "message-1".to_owned(),
-            is_pinned: Some(true),
             is_encrypted: Some(true),
             has_mentioned_user_ids_changed: true,
             mentioned_user_ids: vec!["user-1".to_owned(), "user-2".to_owned()],
@@ -419,7 +414,6 @@ mod tests {
             sender_id: "user-5".to_owned(),
             timestamp: 0,
             related_message_id: None,
-            is_pinned: true,
             is_encrypted: true,
             reactions: Vec::new(),
             mentioned_user_ids: vec!["user-1".to_owned(), "user-2".to_owned()],

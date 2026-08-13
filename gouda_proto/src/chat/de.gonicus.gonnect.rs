@@ -744,9 +744,6 @@ pub struct Message {
     /// message.
     #[prost(string, optional, tag = "5")]
     pub related_message_id: ::core::option::Option<::prost::alloc::string::String>,
-    /// Whether this message is pinned, i.e. prominently shown in the room.
-    #[prost(bool, tag = "6")]
-    pub is_pinned: bool,
     /// Whether this message is considered to be encrypted - which means that the latest
     /// decryption attempt failed. When this field is true, server implementations should
     /// leave the `content` empty and clients should ignore the value of `content`.
@@ -992,10 +989,6 @@ pub struct MessageChangeEvent {
     /// message.
     #[prost(string, tag = "2")]
     pub message_id: ::prost::alloc::string::String,
-    /// Whether the message is pinned (i.e. shown prominently in the room) or
-    /// not. Shall only be set if it has changed.
-    #[prost(bool, optional, tag = "3")]
-    pub is_pinned: ::core::option::Option<bool>,
     /// Whether the message is encrypted or not. Shall only be set if it has
     /// changed. If it changes, the content should usually change as well.
     #[prost(bool, optional, tag = "4")]

@@ -276,7 +276,6 @@ impl MessageChangeEventBuilder {
         let mut event = MessageChangeEvent {
             room_id: self.room_id,
             message_id: self.message_id,
-            is_pinned: self.is_pinned,
             is_encrypted: self.is_encrypted,
             mentioned_user_ids: Vec::new(),
             has_mentioned_user_ids_changed: false,
@@ -652,7 +651,6 @@ mod tests {
         let expected = MessageChangeEvent {
             room_id: "room-1".to_owned(),
             message_id: "message-1".to_owned(),
-            is_pinned: Some(true),
             is_encrypted: Some(false),
             has_mentioned_user_ids_changed: true,
             mentioned_user_ids: vec!["user-1".to_owned(), "user-2".to_owned()],
