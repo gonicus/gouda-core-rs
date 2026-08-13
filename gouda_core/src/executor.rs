@@ -329,6 +329,11 @@ impl RequestProcessor {
                 self.send_result(tag, result.map(ResponseContent::MessageReceivedEvent))
                     .await?;
             }
+            RequestContent::PollAnswerRequest(request) => {
+                let result = self.client.answer_poll(ctx, request).await;
+                self.send_result(tag, result.map(ResponseContent::MessageChangeEvent))
+                    .await?;
+            }
         }
 
         Ok(())

@@ -149,6 +149,9 @@ pub struct ClientMock {
 
     get_message_response: Mutex<Result<Message>>,
     get_message_call_count: Mutex<u32>,
+
+    answer_poll_response: Mutex<Result<MessageChangeEvent>>,
+    answer_poll_call_count: Mutex<u32>,
 }
 
 impl ClientMock {
@@ -553,6 +556,17 @@ impl ClientMock {
     pub fn assert_get_message_called_n(&self, n: u32) {
         assert!(*self.get_message_call_count.lock().unwrap() == n);
     }
+
+    /// The response [`Self::answer_poll`] should return.
+    pub fn answer_poll_response(mut self, response: crate::Result<MessageChangeEvent>) -> Self {
+        self.answer_poll_response = Mutex::new(response.into());
+        self
+    }
+
+    /// Assert [`Self::answer_poll`] was called `n` times.
+    pub fn assert_answer_poll_called_n(&self, n: u32) {
+        assert!(*self.answer_poll_call_count.lock().unwrap() == n);
+    }
 }
 
 #[async_trait::async_trait]
@@ -938,6 +952,16 @@ impl Client for ClientMock {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.get_message_call_count.lock().unwrap() += 1;
         self.get_message_response.lock().unwrap().clone().into()
+    }
+
+    async fn answer_poll(
+        &self,
+        ctx: RequestContext,
+        _request: PollAnswerRequest,
+    ) -> crate::Result<MessageChangeEvent> {
+        *self.received_ctx.lock().unwrap() = Some(ctx);
+        *self.answer_poll_call_count.lock().unwrap() += 1;
+        self.answer_poll_response.lock().unwrap().clone().into()
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
