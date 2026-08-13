@@ -87,6 +87,7 @@ impl From<message::Content> for message_change_event::Content {
             message::Content::Text(t) => Self::Text(t),
             message::Content::File(f) => Self::File(f),
             message::Content::MembershipChange(c) => Self::MembershipChange(c),
+            message::Content::Poll(p) => Self::Poll(p),
         }
     }
 }
@@ -97,6 +98,7 @@ impl From<message_change_event::Content> for message::Content {
             message_change_event::Content::Text(t) => Self::Text(t),
             message_change_event::Content::File(f) => Self::File(f),
             message_change_event::Content::MembershipChange(c) => Self::MembershipChange(c),
+            message_change_event::Content::Poll(p) => Self::Poll(p),
         }
     }
 }
