@@ -38,6 +38,7 @@ pub struct Config {
     pub create_reaction: Reaction,
     pub remove_reaction: Reaction,
     pub get_message: MessageRequest,
+    pub answer_poll: PollAnswerRequest,
 }
 
 impl Config {
