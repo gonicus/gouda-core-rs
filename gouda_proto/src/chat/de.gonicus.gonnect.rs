@@ -2,7 +2,7 @@
 /// Generic container for any message that is sent to the headless client.
 /// Every message sent to the client must be wrapped in this container.
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RequestContainer {
     /// A tag to identify this "to client" message and relate it to the response
     /// in "from client" message. The value 0 means "no identification", i.e. a
@@ -12,7 +12,7 @@ pub struct RequestContainer {
     /// The payload; one of these requests.
     #[prost(
         oneof = "request_container::Content",
-        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 33, 12, 13, 32, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 34, 35, 26, 27, 28, 29, 30, 31"
+        tags = "2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 33, 12, 13, 32, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 34, 35, 26, 27, 28, 29, 30, 31, 36"
     )]
     pub content: ::core::option::Option<request_container::Content>,
 }
@@ -20,7 +20,7 @@ pub struct RequestContainer {
 pub mod request_container {
     /// The payload; one of these requests.
     #[derive(serde::Serialize, serde::Deserialize)]
-    #[derive(Clone, PartialEq, Eq, Hash, ::prost::Oneof)]
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Content {
         #[prost(message, tag = "2")]
         InitializationRequest(super::InitializationRequest),
@@ -90,6 +90,8 @@ pub mod request_container {
         RemoveReactionRequest(super::Reaction),
         #[prost(message, tag = "31")]
         MessageRequest(super::MessageRequest),
+        #[prost(message, tag = "36")]
+        PollAnswerRequest(super::PollAnswerRequest),
     }
 }
 /// Generic container for any message that is sent from the headless client.
@@ -763,7 +765,7 @@ pub struct Message {
     pub thread_id: ::core::option::Option<::prost::alloc::string::String>,
     /// The actual content of the message.
     /// Not specifying the content is not allowed.
-    #[prost(oneof = "message::Content", tags = "9, 11, 12")]
+    #[prost(oneof = "message::Content", tags = "9, 11, 12, 18")]
     pub content: ::core::option::Option<message::Content>,
 }
 /// Nested message and enum types in `Message`.
@@ -771,7 +773,7 @@ pub mod message {
     /// The actual content of the message.
     /// Not specifying the content is not allowed.
     #[derive(serde::Serialize, serde::Deserialize)]
-    #[derive(Clone, PartialEq, Eq, Hash, ::prost::Oneof)]
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Content {
         /// The message content if it is a plain text message.
         #[prost(message, tag = "9")]
@@ -782,6 +784,9 @@ pub mod message {
         /// The message content if it is a membership change.
         #[prost(message, tag = "12")]
         MembershipChange(super::MessageContentMembershipChange),
+        /// The message content if it is a poll.
+        #[prost(message, tag = "18")]
+        Poll(super::MessageContentPoll),
     }
 }
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -874,6 +879,62 @@ pub mod message_content_membership_change {
         }
     }
 }
+/// An option of a poll.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct PollOption {
+    /// The ID of the option. Can be arbitrarily selected by the creator, but
+    /// must be unique within a poll.
+    #[prost(string, tag = "1")]
+    pub id: ::prost::alloc::string::String,
+    /// The text of the option.
+    #[prost(string, tag = "2")]
+    pub text: ::prost::alloc::string::String,
+    /// The ID of the users who selected this option.
+    /// If the poll is undisclosed, this will only be set when the
+    /// poll is completed.
+    #[prost(string, repeated, tag = "3")]
+    pub voted_user_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+/// The message content, if the message is a poll.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct MessageContentPoll {
+    /// The type of the poll
+    #[prost(enumeration = "PollType", tag = "1")]
+    pub r#type: i32,
+    /// If the poll is completed.
+    #[prost(bool, tag = "2")]
+    pub completed: bool,
+    /// The maximum number of options a user can selected.
+    /// Must be greater than or equal to 1.
+    #[prost(uint32, tag = "3")]
+    pub max_selections: u32,
+    /// The question of the poll.
+    #[prost(string, tag = "4")]
+    pub question: ::prost::alloc::string::String,
+    /// The available options of the poll.
+    #[prost(message, repeated, tag = "5")]
+    pub options: ::prost::alloc::vec::Vec<PollOption>,
+}
+/// Answer a poll with a specific option.
+/// Expects a MessageChangeEvent of the poll next.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct PollAnswerRequest {
+    /// ID of the room the poll is in.
+    #[prost(string, tag = "1")]
+    pub room_id: ::prost::alloc::string::String,
+    /// The ID of the poll message.
+    #[prost(string, tag = "2")]
+    pub message_id: ::prost::alloc::string::String,
+    /// The Id of the option to answer with.
+    #[prost(string, tag = "3")]
+    pub option_id: ::prost::alloc::string::String,
+    /// If the option is being selected or deselected.
+    #[prost(bool, tag = "4")]
+    pub selected: bool,
+}
 /// Request a single specific message.
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
@@ -887,7 +948,7 @@ pub struct MessageRequest {
 }
 /// Request to send a new message to a room.
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MessageSendRequest {
     /// Id of the room this message is sent to.
     #[prost(string, tag = "1")]
@@ -907,7 +968,7 @@ pub struct MessageSendRequest {
     pub thread_id: ::core::option::Option<::prost::alloc::string::String>,
     /// The actual content of the message.
     /// This field must not be empty.
-    #[prost(oneof = "message_send_request::Content", tags = "3, 5")]
+    #[prost(oneof = "message_send_request::Content", tags = "3, 5, 11")]
     pub content: ::core::option::Option<message_send_request::Content>,
 }
 /// Nested message and enum types in `MessageSendRequest`.
@@ -915,7 +976,7 @@ pub mod message_send_request {
     /// The actual content of the message.
     /// This field must not be empty.
     #[derive(serde::Serialize, serde::Deserialize)]
-    #[derive(Clone, PartialEq, Eq, Hash, ::prost::Oneof)]
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Content {
         /// The message content if it is a plain text message.
         #[prost(message, tag = "3")]
@@ -923,6 +984,9 @@ pub mod message_send_request {
         /// The message content if it is a file.
         #[prost(message, tag = "5")]
         File(super::MessageContentFile),
+        /// The message content if it is a poll.
+        #[prost(message, tag = "11")]
+        Poll(super::MessageContentPoll),
     }
 }
 /// Confirms that a message has been sent.
@@ -938,7 +1002,7 @@ pub struct MessageSendResponse {
 /// Request changes to the content of an existing chat message.
 /// A MessageChangeEvent or an Error is expected to be received afterwards.
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MessageChangeRequest {
     /// The ID of the room the message is located.
     #[prost(string, tag = "1")]
@@ -959,7 +1023,7 @@ pub struct MessageChangeRequest {
     /// The new content of the message.
     /// This field must not be empty. In order to remove a message, a
     /// MessageRemoveRequest must be made.
-    #[prost(oneof = "message_change_request::Content", tags = "4, 6")]
+    #[prost(oneof = "message_change_request::Content", tags = "4, 6, 11")]
     pub content: ::core::option::Option<message_change_request::Content>,
 }
 /// Nested message and enum types in `MessageChangeRequest`.
@@ -968,7 +1032,7 @@ pub mod message_change_request {
     /// This field must not be empty. In order to remove a message, a
     /// MessageRemoveRequest must be made.
     #[derive(serde::Serialize, serde::Deserialize)]
-    #[derive(Clone, PartialEq, Eq, Hash, ::prost::Oneof)]
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Content {
         /// The message content if it is a plain text message.
         #[prost(message, tag = "4")]
@@ -976,11 +1040,14 @@ pub mod message_change_request {
         /// The message content if it is a file.
         #[prost(message, tag = "6")]
         File(super::MessageContentFile),
+        /// The message content if it is a poll.
+        #[prost(message, tag = "11")]
+        Poll(super::MessageContentPoll),
     }
 }
 /// Notifies about changes in a single Message.
 #[derive(serde::Serialize, serde::Deserialize)]
-#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct MessageChangeEvent {
     /// The ID of the room the message is located.
     #[prost(string, tag = "1")]
@@ -1004,14 +1071,14 @@ pub struct MessageChangeEvent {
     #[prost(bool, optional, tag = "13")]
     pub room_mentioned: ::core::option::Option<bool>,
     /// If set, a new content for the message.
-    #[prost(oneof = "message_change_event::Content", tags = "5, 7, 10")]
+    #[prost(oneof = "message_change_event::Content", tags = "5, 7, 10, 14")]
     pub content: ::core::option::Option<message_change_event::Content>,
 }
 /// Nested message and enum types in `MessageChangeEvent`.
 pub mod message_change_event {
     /// If set, a new content for the message.
     #[derive(serde::Serialize, serde::Deserialize)]
-    #[derive(Clone, PartialEq, Eq, Hash, ::prost::Oneof)]
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Content {
         /// The message content if it is a plain text message.
         #[prost(message, tag = "5")]
@@ -1022,6 +1089,9 @@ pub mod message_change_event {
         /// The message content if it is a membership change.
         #[prost(message, tag = "10")]
         MembershipChange(super::MessageContentMembershipChange),
+        /// The message content if it is a poll.
+        #[prost(message, tag = "14")]
+        Poll(super::MessageContentPoll),
     }
 }
 /// Request the backend to retract and delete an existing message.
@@ -1695,6 +1765,36 @@ impl CrossSigningMethod {
         match value {
             "SasString" => Some(Self::SasString),
             "SasSymbol" => Some(Self::SasSymbol),
+            _ => None,
+        }
+    }
+}
+/// The type of a poll.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum PollType {
+    /// The answers of the poll are always visible.
+    Disclosed = 0,
+    /// The answers of the poll are only visible when the poll is completed.
+    Undisclosed = 1,
+}
+impl PollType {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Self::Disclosed => "Disclosed",
+            Self::Undisclosed => "Undisclosed",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "Disclosed" => Some(Self::Disclosed),
+            "Undisclosed" => Some(Self::Undisclosed),
             _ => None,
         }
     }
