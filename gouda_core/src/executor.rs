@@ -3894,4 +3894,100 @@ mod tests {
         );
         assert!(output_rx.is_empty())
     }
+
+    #[tokio::test]
+    async fn test_poll_answer_request() {
+        // Arrange
+        let request = RequestContent::PollAnswerRequest(PollAnswerRequest::default());
+        let response = MessageChangeEvent {
+            message_id: "some-message-123".to_owned(),
+            ..Default::default()
+        };
+
+        let client = ClientMock::new().answer_poll_response(Ok(response.clone()));
+
+        let (executor_tx, executor_rx) = mpsc::channel(64);
+        let (output_tx, mut output_rx) = mpsc::channel(64);
+
+        let executor = Executor::new(
+            Arc::new(client),
+            executor_rx,
+            executor_tx.clone(),
+            output_tx,
+        );
+
+        // Act
+        executor_tx
+            .try_send(create_executor_task(2, request))
+            .unwrap();
+        executor_tx.try_send(ExecutorTask::Exit).unwrap();
+
+        let Executor { client, .. } = executor
+            .run(CancellationToken::new())
+            .await
+            .unwrap()
+            .unwrap();
+
+        // Assert
+        let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
+        client.assert_answer_poll_called_n(1);
+        client.assert_received_response(ResponseContainer {
+            tag: 2,
+            content: Some(ResponseContent::MessageChangeEvent(response.clone())),
+        });
+
+        assert_eq!(
+            output_rx.recv().await.unwrap(),
+            create_output_task(2, ResponseContent::MessageChangeEvent(response))
+        );
+        assert!(output_rx.is_empty())
+    }
+
+    #[tokio::test]
+    async fn test_poll_answer_request_err() {
+        // Arrange
+        let request = RequestContent::PollAnswerRequest(PollAnswerRequest::default());
+        let response = Error {
+            r#type: ErrorType::Unknown as i32,
+            error_string: Some("Test error".to_owned()),
+        };
+
+        let client = ClientMock::new().answer_poll_response(Err(response.clone()));
+
+        let (executor_tx, executor_rx) = mpsc::channel(64);
+        let (output_tx, mut output_rx) = mpsc::channel(64);
+
+        let executor = Executor::new(
+            Arc::new(client),
+            executor_rx,
+            executor_tx.clone(),
+            output_tx,
+        );
+
+        // Act
+        executor_tx
+            .try_send(create_executor_task(2, request))
+            .unwrap();
+        executor_tx.try_send(ExecutorTask::Exit).unwrap();
+
+        let Executor { client, .. } = executor
+            .run(CancellationToken::new())
+            .await
+            .unwrap()
+            .unwrap();
+
+        // Assert
+        let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
+        client.assert_answer_poll_called_n(1);
+        client.assert_received_response(ResponseContainer {
+            tag: 2,
+            content: Some(ResponseContent::Error(response.clone())),
+        });
+
+        assert_eq!(
+            output_rx.recv().await.unwrap(),
+            create_output_task(2, ResponseContent::Error(response))
+        );
+        assert!(output_rx.is_empty())
+    }
 }
