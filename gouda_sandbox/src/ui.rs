@@ -325,8 +325,8 @@ impl InputUi for message_change_event::Content {
         let text = match self {
             Self::Text(_) => "Text",
             Self::File(_) => "File",
-            Self::MembershipChange(_) => "MembershipChange",
             Self::Poll(_) => "Poll",
+            _ => "Invalid",
         };
 
         ui.vertical(|ui| {
@@ -341,8 +341,8 @@ impl InputUi for message_change_event::Content {
             match self {
                 Self::Text(content) => content.update(ui),
                 Self::File(content) => content.update(ui),
-                Self::MembershipChange(content) => content.update(ui),
                 Self::Poll(content) => content.update(ui),
+                _ => (),
             }
         });
     }
