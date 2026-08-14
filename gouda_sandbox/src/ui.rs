@@ -304,6 +304,7 @@ impl InputUi for message_send_request::Content {
                 .show_ui(ui, |ui| {
                     ui.selectable_value(self, Self::Text(MessageContentText::default()), "Text");
                     ui.selectable_value(self, Self::File(MessageContentFile::default()), "File");
+                    ui.selectable_value(self, Self::Poll(MessageContentPoll::default()), "Poll");
                 });
 
             match self {
@@ -334,6 +335,7 @@ impl InputUi for message_change_event::Content {
                 .show_ui(ui, |ui| {
                     ui.selectable_value(self, Self::Text(MessageContentText::default()), "Text");
                     ui.selectable_value(self, Self::File(MessageContentFile::default()), "File");
+                    ui.selectable_value(self, Self::Poll(MessageContentPoll::default()), "Poll");
                 });
 
             match self {
@@ -364,6 +366,7 @@ impl InputUi for message_change_request::Content {
                 .show_ui(ui, |ui| {
                     ui.selectable_value(self, Self::Text(MessageContentText::default()), "Text");
                     ui.selectable_value(self, Self::File(MessageContentFile::default()), "File");
+                    ui.selectable_value(self, Self::Poll(MessageContentPoll::default()), "Poll");
                 });
 
             match self {
