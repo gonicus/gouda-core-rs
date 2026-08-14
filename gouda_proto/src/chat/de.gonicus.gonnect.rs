@@ -765,7 +765,7 @@ pub struct Message {
     pub thread_id: ::core::option::Option<::prost::alloc::string::String>,
     /// The actual content of the message.
     /// Not specifying the content is not allowed.
-    #[prost(oneof = "message::Content", tags = "9, 11, 12, 18")]
+    #[prost(oneof = "message::Content", tags = "9, 11, 12, 18, 19")]
     pub content: ::core::option::Option<message::Content>,
 }
 /// Nested message and enum types in `Message`.
@@ -787,6 +787,9 @@ pub mod message {
         /// The message content if it is a poll.
         #[prost(message, tag = "18")]
         Poll(super::MessageContentPoll),
+        /// The message content if it has been removed.
+        #[prost(message, tag = "19")]
+        Removed(super::MessageContentRemoved),
     }
 }
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -935,6 +938,16 @@ pub struct PollAnswerRequest {
     #[prost(bool, tag = "4")]
     pub selected: bool,
 }
+/// The message content, if the message has previously been removed and the content
+/// is no longer available.
+/// Unlike MessageRemoveEvent, this should be displayed to the user.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
+pub struct MessageContentRemoved {
+    /// Optional reason why the message was removed.
+    #[prost(string, optional, tag = "1")]
+    pub reason: ::core::option::Option<::prost::alloc::string::String>,
+}
 /// Request a single specific message.
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
@@ -1071,7 +1084,7 @@ pub struct MessageChangeEvent {
     #[prost(bool, optional, tag = "13")]
     pub room_mentioned: ::core::option::Option<bool>,
     /// If set, a new content for the message.
-    #[prost(oneof = "message_change_event::Content", tags = "5, 7, 10, 14")]
+    #[prost(oneof = "message_change_event::Content", tags = "5, 7, 10, 14, 15")]
     pub content: ::core::option::Option<message_change_event::Content>,
 }
 /// Nested message and enum types in `MessageChangeEvent`.
@@ -1092,10 +1105,13 @@ pub mod message_change_event {
         /// The message content if it is a poll.
         #[prost(message, tag = "14")]
         Poll(super::MessageContentPoll),
+        /// The message content if it has been removed.
+        #[prost(message, tag = "15")]
+        Removed(super::MessageContentRemoved),
     }
 }
 /// Request the backend to retract and delete an existing message.
-/// Must result in an Error or MessageRemoveEvent.
+/// Must result in an Error or MessageChangeEvent with the content MessageContentRemoved.
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct MessageRemoveRequest {
@@ -1106,7 +1122,9 @@ pub struct MessageRemoveRequest {
     #[prost(string, tag = "2")]
     pub message_id: ::prost::alloc::string::String,
 }
-/// Event notifying that a message has been retracted and removed.
+/// Event notifying that a message has been retracted by the backend.
+/// Unlike a MessageChangeEvent with MessageContentRemoved, this should not be displayed
+/// to the user.
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct MessageRemoveEvent {
@@ -1116,12 +1134,6 @@ pub struct MessageRemoveEvent {
     /// Id of the removed message.
     #[prost(string, tag = "2")]
     pub message_id: ::prost::alloc::string::String,
-    /// Optional reason for the removal
-    #[prost(string, optional, tag = "3")]
-    pub reason: ::core::option::Option<::prost::alloc::string::String>,
-    /// The origin the the removal event
-    #[prost(enumeration = "EventOrigin", tag = "4")]
-    pub origin: i32,
 }
 /// Request a list of rooms.
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -1795,36 +1807,6 @@ impl PollType {
         match value {
             "Disclosed" => Some(Self::Disclosed),
             "Undisclosed" => Some(Self::Undisclosed),
-            _ => None,
-        }
-    }
-}
-/// Specifies the origin of an event (where ambiguous)
-#[derive(serde::Serialize, serde::Deserialize)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum EventOrigin {
-    /// The event was user-initiated
-    UserOrigin = 0,
-    /// The event was initiated by the backend application
-    BackendOrigin = 1,
-}
-impl EventOrigin {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            Self::UserOrigin => "UserOrigin",
-            Self::BackendOrigin => "BackendOrigin",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "UserOrigin" => Some(Self::UserOrigin),
-            "BackendOrigin" => Some(Self::BackendOrigin),
             _ => None,
         }
     }
