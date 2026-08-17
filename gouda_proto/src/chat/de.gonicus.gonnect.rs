@@ -931,12 +931,9 @@ pub struct PollAnswerRequest {
     /// The ID of the poll message.
     #[prost(string, tag = "2")]
     pub message_id: ::prost::alloc::string::String,
-    /// The Id of the option to answer with.
-    #[prost(string, tag = "3")]
-    pub option_id: ::prost::alloc::string::String,
-    /// If the option is being selected or deselected.
-    #[prost(bool, tag = "4")]
-    pub selected: bool,
+    /// The ID of the selected options. The number of ids must not exceed maxSelections.
+    #[prost(string, repeated, tag = "3")]
+    pub option_id: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// The message content, if the message has previously been removed and the content
 /// is no longer available.
@@ -1121,6 +1118,9 @@ pub struct MessageRemoveRequest {
     /// Id of the chat message that shall be removed.
     #[prost(string, tag = "2")]
     pub message_id: ::prost::alloc::string::String,
+    /// Optional text explaining why the message shall be removed.
+    #[prost(string, optional, tag = "3")]
+    pub reason: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Event notifying that a message has been retracted by the backend.
 /// Unlike a MessageChangeEvent with MessageContentRemoved, this should not be displayed

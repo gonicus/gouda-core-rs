@@ -434,6 +434,7 @@ impl InputUi for MessageRemoveRequest {
     fn update(&mut self, ui: &mut egui::Ui) {
         input_attribute!(self, ui, room_id);
         input_attribute!(self, ui, message_id);
+        input_attribute!(self, ui, reason);
     }
 }
 
@@ -469,6 +470,5 @@ impl InputUi for PollAnswerRequest {
         input_attribute!(self, ui, room_id);
         input_attribute!(self, ui, message_id);
         input_attribute!(self, ui, option_id);
-        input_attribute!(self, ui, selected);
     }
 }
