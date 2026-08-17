@@ -1118,6 +1118,9 @@ pub struct MessageRemoveRequest {
     /// Id of the chat message that shall be removed.
     #[prost(string, tag = "2")]
     pub message_id: ::prost::alloc::string::String,
+    /// Optional text explaining why the message shall be removed.
+    #[prost(string, optional, tag = "3")]
+    pub reason: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Event notifying that a message has been retracted by the backend.
 /// Unlike a MessageChangeEvent with MessageContentRemoved, this should not be displayed
