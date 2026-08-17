@@ -127,7 +127,8 @@
   },
   "remove-message": {
     "room_id": "<ROOM_ID>",
-    "message_id": "<MESSAGE_ID>"
+    "message_id": "<MESSAGE_ID>",
+    "reason": null
   },
   "change-message": {
     "room_id": "<ROOM_ID>",
@@ -158,6 +159,6 @@
   "answer-poll": {
     "room_id": "<ROOM_ID>",
     "message_id": "<MESSAGE_ID>",
-    "option_id": "<OPTION_ID>"
+    "option_id": []
   }
 }
