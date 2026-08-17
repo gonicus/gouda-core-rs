@@ -469,6 +469,5 @@ impl InputUi for PollAnswerRequest {
         input_attribute!(self, ui, room_id);
         input_attribute!(self, ui, message_id);
         input_attribute!(self, ui, option_id);
-        input_attribute!(self, ui, selected);
     }
 }
