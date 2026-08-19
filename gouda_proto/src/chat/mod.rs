@@ -154,6 +154,8 @@ impl RoomChangeEvent {
         if self.has_pinned_messages_changed {
             room.pinned_messages = self.pinned_messages;
         }
+
+        room.read_marker.extend(self.read_marker);
     }
 }
 
@@ -236,6 +238,7 @@ mod tests {
             }),
             has_pinned_messages_changed: true,
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
+            read_marker: HashMap::from([("user-1".to_owned(), "message-1".to_owned())]),
         };
 
         let expected = Room {
@@ -255,6 +258,7 @@ mod tests {
             }),
             invitation_text: None,
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
+            read_marker: HashMap::from([("user-1".to_owned(), "message-1".to_owned())]),
         };
 
         let mut room = Room {

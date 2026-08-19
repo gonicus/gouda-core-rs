@@ -17,6 +17,7 @@ pub struct RoomChangeEventBuilder {
     is_favourite: Option<bool>,
     room_settings: Option<RoomSettings>,
     pinned_messages: Option<Vec<String>>,
+    read_marker: HashMap<String, String>,
 }
 
 impl RoomChangeEventBuilder {
@@ -68,6 +69,10 @@ impl RoomChangeEventBuilder {
 
         if old.pinned_messages != new.pinned_messages {
             obj = obj.change_pinned_messages(new.pinned_messages.clone());
+        }
+
+        if old.read_marker != new.read_marker {
+            obj = obj.change_read_marker(new.read_marker.clone());
         }
 
         obj
@@ -128,6 +133,11 @@ impl RoomChangeEventBuilder {
         self
     }
 
+    pub fn change_read_marker(mut self, read_marker: HashMap<String, String>) -> Self {
+        self.read_marker = read_marker;
+        self
+    }
+
     pub fn to_proto(self) -> RoomChangeEvent {
         let mut event = RoomChangeEvent {
             room_id: self.room_id,
@@ -145,6 +155,7 @@ impl RoomChangeEventBuilder {
             room_settings: self.room_settings,
             has_pinned_messages_changed: false,
             pinned_messages: Vec::new(),
+            read_marker: self.read_marker,
         };
 
         if let Some(user_id_list) = self.user_id_list {
@@ -324,6 +335,7 @@ mod tests {
             }),
             invitation_text: None,
             pinned_messages: vec!["message-1".to_owned()],
+            read_marker: HashMap::from([("user-1".to_owned(), "message-1".to_owned())]),
         };
 
         let new = Room {
@@ -350,6 +362,7 @@ mod tests {
             }),
             invitation_text: Some("Some Invitation".to_owned()),
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
+            read_marker: HashMap::from([("user-1".to_owned(), "message-2".to_owned())]),
         };
 
         let expected = RoomChangeEventBuilder {
@@ -377,6 +390,7 @@ mod tests {
                 notification_setting: Some(NotificationSetting::Mute.into()),
             }),
             pinned_messages: Some(vec!["message-1".to_owned(), "message-2".to_owned()]),
+            read_marker: HashMap::from([("user-1".to_owned(), "message-2".to_owned())]),
         };
 
         let result = RoomChangeEventBuilder::compare_rooms(&old, &new);
@@ -461,6 +475,7 @@ mod tests {
                 notification_setting: Some(NotificationSetting::Mute.into()),
             }),
             pinned_messages: Some(vec!["message-1".to_owned(), "message-2".to_owned()]),
+            read_marker: HashMap::from([("user-1".to_owned(), "message-2".to_owned())]),
         };
 
         let expected = RoomChangeEvent {
@@ -488,6 +503,7 @@ mod tests {
             }),
             has_pinned_messages_changed: true,
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
+            read_marker: HashMap::from([("user-1".to_owned(), "message-2".to_owned())]),
         };
 
         let result = builder.to_proto();
