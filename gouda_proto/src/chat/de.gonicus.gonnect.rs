@@ -1290,6 +1290,12 @@ pub struct Room {
     /// The ID of messages pinned to the room.
     #[prost(string, repeated, tag = "14")]
     pub pinned_messages: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Ids of users and the last message they have marked as read inside the room.
+    #[prost(map = "string, string", tag = "15")]
+    pub read_marker: ::std::collections::HashMap<
+        ::prost::alloc::string::String,
+        ::prost::alloc::string::String,
+    >,
 }
 /// Defines single points of authorization for a room that may or may not be done
 /// by this client's user.
@@ -1377,6 +1383,13 @@ pub struct RoomChangeEvent {
     /// The ID of messages pinned to the room.
     #[prost(string, repeated, tag = "15")]
     pub pinned_messages: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Ids of users and the last message they have marked as read inside the room.
+    /// May only contain changed user ids.
+    #[prost(map = "string, string", tag = "16")]
+    pub read_marker: ::std::collections::HashMap<
+        ::prost::alloc::string::String,
+        ::prost::alloc::string::String,
+    >,
 }
 /// Notify the client that messages and notifications in this room have been
 /// read by the user.
