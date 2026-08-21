@@ -1466,6 +1466,9 @@ pub struct RoomMessagesRequest {
     /// be limited at whatever applies first - the toMessageId or the limit.
     #[prost(uint32, optional, tag = "4")]
     pub limit: ::core::option::Option<u32>,
+    /// If the messages of a specific thread should be fetched.
+    #[prost(string, optional, tag = "5")]
+    pub thread_id: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Describes a request to search for known users, i.e. accounts registered to
 /// the chat backend. Only available if the capability userSearch is available.
