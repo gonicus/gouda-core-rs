@@ -267,6 +267,7 @@ impl InputUi for RoomMessagesRequest {
         input_attribute!(self, ui, order);
         input_attribute!(self, ui, from_message_id);
         input_attribute!(self, ui, limit);
+        input_attribute!(self, ui, thread_id);
     }
 }
 
