@@ -238,7 +238,7 @@ mod tests {
             }),
             has_pinned_messages_changed: true,
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
-            read_marker: HashMap::from([("user-1".to_owned(), "message-1".to_owned())]),
+            read_marker: HashMap::new(),
         };
 
         let expected = Room {
@@ -258,7 +258,7 @@ mod tests {
             }),
             invitation_text: None,
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
-            read_marker: HashMap::from([("user-1".to_owned(), "message-1".to_owned())]),
+            read_marker: HashMap::new(),
         };
 
         let mut room = Room {
