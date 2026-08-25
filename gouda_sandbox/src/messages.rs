@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use gouda_proto::chat::response_container::Content as ResponseContent;
 use gouda_proto::chat::{
@@ -10,6 +10,8 @@ use crate::context::Context;
 #[derive(Debug, Default)]
 struct Room {
     messages: HashMap<String, Message>,
+    threads: HashSet<String>,
+    opened_thread: Option<String>,
 }
 
 pub struct MessagesWindow {
@@ -40,10 +42,6 @@ impl MessagesWindow {
         self.rooms.entry(room_id.into()).or_default()
     }
 
-    fn get_selected_room(&self) -> Option<&Room> {
-        self.rooms.get(self.selected_room.as_ref()?)
-    }
-
     fn collect_responses(&mut self, context: &mut Context) {
         let responses: Vec<ResponseContainer> = context.received_responses().to_vec();
 
@@ -71,6 +69,11 @@ impl MessagesWindow {
 
     fn collect_message(&mut self, message: Message) {
         let room = self.get_or_create_room(&message.room_id);
+
+        if let Some(thread_id) = &message.thread_id {
+            room.threads.insert(thread_id.clone());
+        }
+
         room.messages.insert(message.message_id.clone(), message);
     }
 
@@ -107,12 +110,21 @@ impl MessagesWindow {
     fn ui(&mut self, ui: &mut egui::Ui) {
         self.ui_room_selection(ui);
 
-        let Some(room) = self.get_selected_room() else {
+        let mut rooms = std::mem::take(&mut self.rooms);
+
+        let Some(selected) = &self.selected_room else {
+            ui.label("No room selected");
+            return;
+        };
+
+        let Some(room) = rooms.get_mut(selected) else {
             ui.label("No room selected");
             return;
         };
 
         self.ui_room(ui, room);
+
+        self.rooms = rooms;
     }
 
     fn ui_room_selection(&mut self, ui: &mut egui::Ui) {
@@ -135,24 +147,65 @@ impl MessagesWindow {
             });
     }
 
-    fn ui_room(&self, ui: &mut egui::Ui, room: &Room) {
+    fn ui_room(&self, ui: &mut egui::Ui, room: &mut Room) {
         let num_messages = room.messages.len();
         let num_encrypted = room.messages.values().filter(|p| p.is_encrypted).count();
 
         ui.label(format!("Messages: {num_messages}"));
         ui.label(format!("Encrypted: {num_encrypted} / {num_messages}"));
 
+        self.ui_threads(ui, room);
+
         egui::containers::ScrollArea::vertical()
             .auto_shrink([false, false])
             .stick_to_bottom(true)
             .show(ui, |ui| {
-                let mut messages: Vec<&Message> = room.messages.values().collect();
-                messages.sort_by_key(|f| f.timestamp);
+                self.ui_messages(ui, room);
+            });
+    }
 
-                for message in messages {
-                    self.ui_message(ui, message);
+    fn ui_threads(&self, ui: &mut egui::Ui, room: &mut Room) {
+        let selected_text = if let Some(thread) = room.opened_thread.as_ref() {
+            thread.as_ref()
+        } else {
+            "Main"
+        };
+
+        egui::ComboBox::from_label("Thread")
+            .selected_text(selected_text)
+            .show_ui(ui, |ui| {
+                if ui
+                    .selectable_label(room.opened_thread.is_none(), "Main")
+                    .clicked()
+                {
+                    room.opened_thread = None;
+                };
+
+                for thread in &room.threads {
+                    let selected = Some(thread) == room.opened_thread.as_ref();
+
+                    if ui.selectable_label(selected, thread).clicked() {
+                        room.opened_thread = Some(thread.clone());
+                    }
                 }
             });
+    }
+
+    fn ui_messages(&self, ui: &mut egui::Ui, room: &Room) {
+        let mut messages: Vec<&Message> = room.messages.values().collect();
+        messages.sort_by_key(|f| f.timestamp);
+
+        for message in messages {
+            if let Some(thread_id) = room.opened_thread.as_ref() {
+                if message.thread_id.as_ref() == Some(thread_id) {
+                    self.ui_message(ui, message);
+                }
+
+                continue;
+            }
+
+            self.ui_message(ui, message);
+        }
     }
 
     fn ui_message(&self, ui: &mut egui::Ui, message: &Message) {
