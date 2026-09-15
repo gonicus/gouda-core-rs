@@ -722,8 +722,8 @@ pub struct CapabilityEvent {
     #[prost(string, repeated, tag = "4")]
     pub mime_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// The maximum allowed size in bytes of media files that are uploaded.
-    #[prost(uint64, tag = "10")]
-    pub media_size_limit: u64,
+    #[prost(uint64, optional, tag = "10")]
+    pub media_size_limit: ::core::option::Option<u64>,
 }
 /// A message sent to a room.
 #[derive(serde::Serialize, serde::Deserialize)]
