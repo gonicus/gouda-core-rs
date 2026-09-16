@@ -113,6 +113,7 @@ impl InputUi for InitializationRequest {
         input_attribute!(self, ui, persistent_storage_secret);
         input_attribute!(self, ui, encryption_secret);
         input_attribute!(self, ui, device_display_name);
+        input_attribute!(self, ui, verify_certificates);
     }
 }
 
