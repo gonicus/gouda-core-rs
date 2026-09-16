@@ -339,6 +339,9 @@ pub struct InitializationRequest {
     /// The display name of this device.
     #[prost(string, tag = "5")]
     pub device_display_name: ::prost::alloc::string::String,
+    /// Whether the client shall verify certificates (e.g. server TLS).
+    #[prost(bool, tag = "6")]
+    pub verify_certificates: bool,
 }
 /// Send when the verification status or related information has changed. Must
 /// be sent at least once if CapabilityResponse.clientVerification is true. If
