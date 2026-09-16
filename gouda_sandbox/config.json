@@ -4,7 +4,8 @@
     "data_root_path": "/tmp/gouda",
     "persistent_storage_secret": "secret123",
     "encryption_secret": "secret123",
-    "device_display_name": "GOuda Chat Client"
+    "device_display_name": "GOuda Chat Client",
+    "verify_certificates": true
   },
   "login-username-password": {
     "username": "<USER>",
