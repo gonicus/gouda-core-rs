@@ -766,6 +766,9 @@ pub struct Message {
     /// The ID of the thread, if the message was send within a thread.
     #[prost(string, optional, tag = "17")]
     pub thread_id: ::core::option::Option<::prost::alloc::string::String>,
+    /// If the message has been edited.
+    #[prost(bool, tag = "20")]
+    pub edited: bool,
     /// The actual content of the message.
     /// Not specifying the content is not allowed.
     #[prost(oneof = "message::Content", tags = "9, 11, 12, 18, 19")]
