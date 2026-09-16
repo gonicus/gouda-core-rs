@@ -430,6 +430,7 @@ mod tests {
                 content: "Hello world".to_owned(),
             })),
             thread_id: None,
+            edited: false,
         };
 
         let mut message = Message {
