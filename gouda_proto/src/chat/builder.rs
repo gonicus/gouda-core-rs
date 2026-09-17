@@ -247,6 +247,7 @@ pub struct MessageChangeEventBuilder {
     mentioned_user_ids: Option<Vec<String>>,
     room_mentioned: Option<bool>,
     content: Option<message_change_event::Content>,
+    edited: Option<bool>,
 }
 
 impl MessageChangeEventBuilder {
@@ -283,6 +284,11 @@ impl MessageChangeEventBuilder {
         self
     }
 
+    pub fn change_edited(mut self, edited: bool) -> Self {
+        self.edited = Some(edited);
+        self
+    }
+
     pub fn to_proto(self) -> MessageChangeEvent {
         let mut event = MessageChangeEvent {
             room_id: self.room_id,
@@ -292,6 +298,7 @@ impl MessageChangeEventBuilder {
             has_mentioned_user_ids_changed: false,
             room_mentioned: self.room_mentioned,
             content: self.content,
+            edited: self.edited,
         };
 
         if let Some(mentioned_user_ids) = self.mentioned_user_ids {
@@ -662,6 +669,7 @@ mod tests {
             content: Some(message_change_event::Content::Text(MessageContentText {
                 content: "new content".to_owned(),
             })),
+            edited: Some(false),
         };
 
         let expected = MessageChangeEvent {
@@ -674,6 +682,7 @@ mod tests {
             content: Some(message_change_event::Content::Text(MessageContentText {
                 content: "new content".to_owned(),
             })),
+            edited: Some(false),
         };
 
         let result = builder.to_proto();
