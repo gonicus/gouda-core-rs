@@ -200,6 +200,10 @@ impl MessageChangeEvent {
         if let Some(content) = self.content {
             message.content = Some(content.into());
         }
+
+        if let Some(edited) = self.edited {
+            message.edited = edited;
+        }
     }
 }
 
@@ -414,6 +418,7 @@ mod tests {
             content: Some(message_change_event::Content::Text(MessageContentText {
                 content: "Hello world".to_owned(),
             })),
+            edited: Some(true),
         };
 
         let expected = Message {
@@ -430,7 +435,7 @@ mod tests {
                 content: "Hello world".to_owned(),
             })),
             thread_id: None,
-            edited: false,
+            edited: true,
         };
 
         let mut message = Message {
