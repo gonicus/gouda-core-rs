@@ -89,7 +89,8 @@
     "display_name": null,
     "is_public": null,
     "is_favourite": null,
-    "avatar_path": null
+    "avatar_path": null,
+    "conference_url": null
   },
   "leave-room": {
     "room_id": "<ROOM_ID>"

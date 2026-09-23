@@ -240,6 +240,7 @@ impl InputUi for RoomChangeRequest {
         input_attribute!(self, ui, join_rule);
         input_attribute!(self, ui, is_favorite);
         input_attribute!(self, ui, avatar_path);
+        input_attribute!(self, ui, conference_url);
     }
 }
 
