@@ -41,12 +41,13 @@ pub trait Client: Send + Sync {
     }
 
     /// Login with username and password.
+    /// An [`gouda_proto::chat::StatusUpdate`] is expected when the login flow is finished.
     #[allow(unused_variables)]
     async fn login_username_password(
         &self,
         ctx: RequestContext,
         request: LoginUsernamePasswordRequest,
-    ) -> Result<StatusUpdate> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
@@ -57,17 +58,18 @@ pub trait Client: Send + Sync {
         &self,
         ctx: RequestContext,
         request: LoginSsoRequest,
-    ) -> Result<LoginSsoResponse> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
     /// Verifies this client using a recovery key.
+    /// A [`gouda_proto::chat::VerificationEndEvent] is expected afterwards.
     #[allow(unused_variables)]
     async fn recovery_key_verification(
         &self,
         ctx: RequestContext,
         request: RecoveryKeyVerificationRequest,
-    ) -> Result<VerificationEndEvent> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
@@ -102,12 +104,13 @@ pub trait Client: Send + Sync {
     }
 
     /// Aborts an ongoing cross signing flow.
+    /// A [`gouda_proto::chat::VerificationEndEvent] is expected afterwards.
     #[allow(unused_variables)]
     async fn abort_verification(
         &self,
         ctx: RequestContext,
         request: VerificationAbortRequest,
-    ) -> Result<VerificationEndEvent> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
@@ -159,7 +162,7 @@ pub trait Client: Send + Sync {
         &self,
         ctx: RequestContext,
         request: InvitationRequest,
-    ) -> Result<RoomChangeEvent> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
@@ -200,22 +203,24 @@ pub trait Client: Send + Sync {
     }
 
     /// Changes a rooms settings.
+    /// A [`gouda_proto::chat::RoomChangeEvent] is expected afterwards.
     #[allow(unused_variables)]
     async fn change_room(
         &self,
         ctx: RequestContext,
         request: RoomChangeRequest,
-    ) -> Result<RoomChangeEvent> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
     /// Leaves a room.
+    /// A [`gouda_proto::chat::RoomLeftEvent] is expected afterwards.
     #[allow(unused_variables)]
     async fn leave_room(
         &self,
         ctx: RequestContext,
         request: RoomLeaveRequest,
-    ) -> Result<RoomLeftEvent> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
@@ -232,6 +237,7 @@ pub trait Client: Send + Sync {
     }
 
     /// Gets the messages of a room.
+    /// Messages should be returned async using a [`gouda_core::MultipartResponse`].
     #[allow(unused_variables)]
     async fn get_room_messages(
         &self,
@@ -242,12 +248,13 @@ pub trait Client: Send + Sync {
     }
 
     /// Marks a room as read.
+    /// A [`gouda_proto::chat::RoomChangeEvent] is expected afterwards.
     #[allow(unused_variables)]
     async fn mark_as_read(
         &self,
         ctx: RequestContext,
         request: RoomMarkAsReadRequest,
-    ) -> Result<RoomChangeEvent> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
@@ -262,12 +269,13 @@ pub trait Client: Send + Sync {
     }
 
     /// Pin or unpin a message from a room.
+    /// A [`gouda_proto::chat::RoomChangeEvent] is expected afterwards.
     #[allow(unused_variables)]
     async fn pin_unpin_message(
         &self,
         ctx: RequestContext,
         request: RoomPinRequest,
-    ) -> Result<RoomChangeEvent> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
@@ -320,12 +328,13 @@ pub trait Client: Send + Sync {
     }
 
     /// Answers a poll.
+    /// A [`gouda_proto::chat::MessageChangeEvent] is expected afterwards.
     #[allow(unused_variables)]
     async fn answer_poll(
         &self,
         ctx: RequestContext,
         request: PollAnswerRequest,
-    ) -> Result<MessageChangeEvent> {
+    ) -> Result<()> {
         not_implemented_error()
     }
 
