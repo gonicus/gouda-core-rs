@@ -156,6 +156,14 @@ impl RoomChangeEvent {
         }
 
         room.read_marker.extend(self.read_marker);
+
+        if let Some(conference_url) = self.conference_url {
+            if conference_url.is_empty() {
+                room.conference_url = None;
+            } else {
+                room.conference_url = Some(conference_url);
+            }
+        }
     }
 }
 
@@ -222,6 +230,7 @@ mod tests {
             can_ban: false,
             can_mention_room: true,
             can_pin_messages: false,
+            can_edit_conference_url: true,
         });
 
         let event = RoomChangeEvent {
@@ -243,6 +252,7 @@ mod tests {
             has_pinned_messages_changed: true,
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
             read_marker: HashMap::new(),
+            conference_url: Some("Conference 1".to_string()),
         };
 
         let expected = Room {
@@ -263,6 +273,7 @@ mod tests {
             invitation_text: None,
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
             read_marker: HashMap::new(),
+            conference_url: Some("Conference 1".to_owned()),
         };
 
         let mut room = Room {
