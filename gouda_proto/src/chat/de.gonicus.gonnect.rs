@@ -1302,6 +1302,9 @@ pub struct Room {
     /// User IDs and the timestamp up to the time they read the chat.
     #[prost(map = "string, uint64", tag = "15")]
     pub read_marker: ::std::collections::HashMap<::prost::alloc::string::String, u64>,
+    /// The conference url, if the room is associated with a conference.
+    #[prost(string, optional, tag = "16")]
+    pub conference_url: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Defines single points of authorization for a room that may or may not be done
 /// by this client's user.
@@ -1327,6 +1330,9 @@ pub struct RoomPermissions {
     /// The user can pin messages in a room.
     #[prost(bool, tag = "6")]
     pub can_pin_messages: bool,
+    /// The user can edit the conference url of the room.
+    #[prost(bool, tag = "7")]
+    pub can_edit_conference_url: bool,
 }
 /// Informs the client about changes in a single room.
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -1393,6 +1399,9 @@ pub struct RoomChangeEvent {
     /// May only contain changed user ids.
     #[prost(map = "string, uint64", tag = "16")]
     pub read_marker: ::std::collections::HashMap<::prost::alloc::string::String, u64>,
+    /// Updated conference url, if it has changed.
+    #[prost(string, optional, tag = "17")]
+    pub conference_url: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Notify the client that messages and notifications in this room have been
 /// read by the user.
@@ -1623,6 +1632,9 @@ pub struct RoomChangeRequest {
     /// An empty string means that the room avatar shall be removed.
     #[prost(string, optional, tag = "5")]
     pub avatar_path: ::core::option::Option<::prost::alloc::string::String>,
+    /// If the conference the room is associated with should be changed.
+    #[prost(string, optional, tag = "6")]
+    pub conference_url: ::core::option::Option<::prost::alloc::string::String>,
 }
 /// Request to leave a specific room.
 /// Expects a RoomLeftEvent next.
