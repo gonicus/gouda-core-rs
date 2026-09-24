@@ -165,18 +165,21 @@ impl RequestProcessor {
             }
             RequestContent::LoginUsernamePasswordRequest(request) => {
                 let result = self.client.login_username_password(ctx, request).await;
-                self.send_result(0, result.map(ResponseContent::StatusUpdate))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
             RequestContent::LoginSsoRequest(request) => {
                 let result = self.client.login_sso(ctx, request).await;
-                self.send_result(tag, result.map(ResponseContent::LoginSsoResponse))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
             RequestContent::RecoveryKeyVerificationRequest(request) => {
                 let result = self.client.recovery_key_verification(ctx, request).await;
-                self.send_result(0, result.map(ResponseContent::VerificationEndEvent))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
             RequestContent::CrossSigningStartRequest(request) => {
                 let result = self.client.cross_signing_start(ctx, request).await;
@@ -197,8 +200,9 @@ impl RequestProcessor {
             }
             RequestContent::VerificationAbortRequest(request) => {
                 let result = self.client.abort_verification(ctx, request).await;
-                self.send_result(0, result.map(ResponseContent::VerificationEndEvent))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
             RequestContent::GlobalSettingsRequest(request) => {
                 let result = self.client.get_global_settings(ctx, request).await;
@@ -228,8 +232,9 @@ impl RequestProcessor {
             }
             RequestContent::InvitationRequest(request) => {
                 let result = self.client.invite(ctx, request).await;
-                self.send_result(tag, result.map(ResponseContent::RoomChangeEvent))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
             RequestContent::InvitedReply(request) => {
                 let result = self.client.invitation_reply(ctx, request).await;
@@ -254,13 +259,15 @@ impl RequestProcessor {
             }
             RequestContent::RoomChangeRequest(request) => {
                 let result = self.client.change_room(ctx, request).await;
-                self.send_result(tag, result.map(ResponseContent::RoomChangeEvent))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
             RequestContent::RoomLeaveRequest(request) => {
                 let result = self.client.leave_room(ctx, request).await;
-                self.send_result(tag, result.map(ResponseContent::RoomLeftEvent))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
             RequestContent::RoomJoinRequest(request) => {
                 let result = self.client.join_room(ctx, request).await;
@@ -281,8 +288,9 @@ impl RequestProcessor {
             }
             RequestContent::RoomMarkAsReadRequest(request) => {
                 let result = self.client.mark_as_read(ctx, request).await;
-                self.send_result(tag, result.map(ResponseContent::RoomChangeEvent))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
             RequestContent::RoomTypingRequest(request) => {
                 let result = self.client.activate_typing_notice(ctx, request).await;
@@ -292,8 +300,9 @@ impl RequestProcessor {
             }
             RequestContent::RoomPinRequest(request) => {
                 let result = self.client.pin_unpin_message(ctx, request).await;
-                self.send_result(tag, result.map(ResponseContent::RoomChangeEvent))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
             RequestContent::MessageSendRequest(request) => {
                 let result = self.client.send_message(ctx, request).await;
@@ -331,8 +340,9 @@ impl RequestProcessor {
             }
             RequestContent::PollAnswerRequest(request) => {
                 let result = self.client.answer_poll(ctx, request).await;
-                self.send_result(tag, result.map(ResponseContent::MessageChangeEvent))
-                    .await?;
+                if let Err(err) = result {
+                    self.send_result(tag, Err(err)).await?;
+                }
             }
         }
 
@@ -888,11 +898,8 @@ mod tests {
         // Arrange
         let request =
             RequestContent::LoginUsernamePasswordRequest(LoginUsernamePasswordRequest::default());
-        let response = StatusUpdate {
-            code: status_update::StatusCode::LoggedIn as i32,
-        };
 
-        let client = ClientMock::new().login_username_password_response(Ok(response));
+        let client = ClientMock::new().login_username_password_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -920,10 +927,6 @@ mod tests {
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_login_username_password_called_n(1);
 
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(0, ResponseContent::StatusUpdate(response))
-        );
         assert!(output_rx.is_empty())
     }
 
@@ -976,11 +979,7 @@ mod tests {
     async fn test_login_sso_request() {
         // Arrange
         let request = RequestContent::LoginSsoRequest(LoginSsoRequest::default());
-        let response = LoginSsoResponse {
-            login_url: "https://some.backend".to_owned(),
-        };
-
-        let client = ClientMock::new().login_sso_response(Ok(response.clone()));
+        let client = ClientMock::new().login_sso_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -1007,15 +1006,6 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_login_sso_called_n(1);
-        client.assert_received_response(ResponseContainer {
-            tag: 2,
-            content: Some(ResponseContent::LoginSsoResponse(response.clone())),
-        });
-
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(2, ResponseContent::LoginSsoResponse(response))
-        );
         assert!(output_rx.is_empty())
     }
 
@@ -1073,12 +1063,8 @@ mod tests {
         let request = RequestContent::RecoveryKeyVerificationRequest(
             RecoveryKeyVerificationRequest::default(),
         );
-        let response = VerificationEndEvent {
-            verification_flow_id: None,
-            result: Some(verification_end_event::Result::Successful(true)),
-        };
 
-        let client = ClientMock::new().recovery_key_verification_response(Ok(response.clone()));
+        let client = ClientMock::new().recovery_key_verification_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -1105,15 +1091,6 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_recovery_key_verification_called_n(1);
-        client.assert_received_response(ResponseContainer {
-            tag: 0,
-            content: Some(ResponseContent::VerificationEndEvent(response.clone())),
-        });
-
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(0, ResponseContent::VerificationEndEvent(response))
-        );
         assert!(output_rx.is_empty())
     }
 
@@ -1440,12 +1417,7 @@ mod tests {
     async fn test_verification_abort_request() {
         // Arrange
         let request = RequestContent::VerificationAbortRequest(VerificationAbortRequest::default());
-        let response = VerificationEndEvent {
-            verification_flow_id: Some("some-flow-123".to_owned()),
-            result: None,
-        };
-
-        let client = ClientMock::new().abort_verification_response(Ok(response.clone()));
+        let client = ClientMock::new().abort_verification_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -1472,15 +1444,6 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_abort_verification_called_n(1);
-        client.assert_received_response(ResponseContainer {
-            tag: 0,
-            content: Some(ResponseContent::VerificationEndEvent(response.clone())),
-        });
-
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(0, ResponseContent::VerificationEndEvent(response))
-        );
         assert!(output_rx.is_empty())
     }
 
@@ -2023,30 +1986,7 @@ mod tests {
     async fn test_invitation_request() {
         // Arrange
         let request = RequestContent::InvitationRequest(InvitationRequest::default());
-        let response = RoomChangeEvent {
-            room_id: "new-room".to_owned(),
-            has_typing_user_id_list_changed: true,
-            has_user_id_list_changed: false,
-            user_id_list: HashMap::from([
-                ("user-1".to_owned(), UserRoomState::Joined as i32),
-                ("user-4".to_owned(), UserRoomState::Joined as i32),
-            ]),
-            typing_user_id_list: Vec::new(),
-            display_name: None,
-            unread_count: Some(0),
-            join_rule: None,
-            is_direct: None,
-            permissions: None,
-            avatar_path: None,
-            is_favorite: None,
-            room_settings: None,
-            has_pinned_messages_changed: false,
-            pinned_messages: Vec::new(),
-            read_marker: HashMap::new(),
-            conference_url: None,
-        };
-
-        let client = ClientMock::new().invite_response(Ok(response.clone()));
+        let client = ClientMock::new().invite_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -2073,15 +2013,6 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_invite_called_n(1);
-        client.assert_received_response(ResponseContainer {
-            tag: 2,
-            content: Some(ResponseContent::RoomChangeEvent(response.clone())),
-        });
-
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(2, ResponseContent::RoomChangeEvent(response))
-        );
         assert!(output_rx.is_empty())
     }
 
@@ -2586,30 +2517,7 @@ mod tests {
     async fn test_room_change_request() {
         // Arrange
         let request = RequestContent::RoomChangeRequest(RoomChangeRequest::default());
-        let response = RoomChangeEvent {
-            room_id: "new-room".to_owned(),
-            has_typing_user_id_list_changed: true,
-            has_user_id_list_changed: false,
-            user_id_list: HashMap::from([
-                ("user-1".to_owned(), UserRoomState::Joined as i32),
-                ("user-4".to_owned(), UserRoomState::Joined as i32),
-            ]),
-            typing_user_id_list: Vec::new(),
-            display_name: None,
-            unread_count: Some(0),
-            join_rule: None,
-            is_direct: None,
-            permissions: None,
-            avatar_path: None,
-            is_favorite: None,
-            room_settings: None,
-            has_pinned_messages_changed: false,
-            pinned_messages: Vec::new(),
-            read_marker: HashMap::new(),
-            conference_url: None,
-        };
-
-        let client = ClientMock::new().change_room_response(Ok(response.clone()));
+        let client = ClientMock::new().change_room_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -2636,15 +2544,6 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_change_room_called_n(1);
-        client.assert_received_response(ResponseContainer {
-            tag: 2,
-            content: Some(ResponseContent::RoomChangeEvent(response.clone())),
-        });
-
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(2, ResponseContent::RoomChangeEvent(response))
-        );
         assert!(output_rx.is_empty())
     }
 
@@ -2700,13 +2599,7 @@ mod tests {
     async fn test_room_leave_request() {
         // Arrange
         let request = RequestContent::RoomLeaveRequest(RoomLeaveRequest::default());
-        let response = RoomLeftEvent {
-            room_id: "some-room".to_owned(),
-            reason: room_left_event::RoomLeaveReason::User.into(),
-            message: None,
-        };
-
-        let client = ClientMock::new().leave_room_response(Ok(response.clone()));
+        let client = ClientMock::new().leave_room_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -2733,15 +2626,6 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_leave_room_called_n(1);
-        client.assert_received_response(ResponseContainer {
-            tag: 2,
-            content: Some(ResponseContent::RoomLeftEvent(response.clone())),
-        });
-
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(2, ResponseContent::RoomLeftEvent(response))
-        );
         assert!(output_rx.is_empty())
     }
 
@@ -3078,30 +2962,7 @@ mod tests {
     async fn test_room_mark_as_read_request() {
         // Arrange
         let request = RequestContent::RoomMarkAsReadRequest(RoomMarkAsReadRequest::default());
-        let response = RoomChangeEvent {
-            room_id: "new-room".to_owned(),
-            has_typing_user_id_list_changed: true,
-            has_user_id_list_changed: false,
-            user_id_list: HashMap::from([
-                ("user-1".to_owned(), UserRoomState::Joined as i32),
-                ("user-4".to_owned(), UserRoomState::Joined as i32),
-            ]),
-            typing_user_id_list: Vec::new(),
-            display_name: None,
-            unread_count: Some(0),
-            join_rule: None,
-            is_direct: None,
-            permissions: None,
-            avatar_path: None,
-            is_favorite: None,
-            room_settings: None,
-            has_pinned_messages_changed: false,
-            pinned_messages: Vec::new(),
-            read_marker: HashMap::new(),
-            conference_url: None,
-        };
-
-        let client = ClientMock::new().mark_as_read_response(Ok(response.clone()));
+        let client = ClientMock::new().mark_as_read_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -3128,15 +2989,6 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_mark_as_read_called_n(1);
-        client.assert_received_response(ResponseContainer {
-            tag: 2,
-            content: Some(ResponseContent::RoomChangeEvent(response.clone())),
-        });
-
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(2, ResponseContent::RoomChangeEvent(response))
-        );
         assert!(output_rx.is_empty())
     }
 
@@ -3276,30 +3128,7 @@ mod tests {
     async fn test_room_pin_request() {
         // Arrange
         let request = RequestContent::RoomPinRequest(RoomPinRequest::default());
-        let response = RoomChangeEvent {
-            room_id: "new-room".to_owned(),
-            has_typing_user_id_list_changed: true,
-            has_user_id_list_changed: false,
-            user_id_list: HashMap::from([
-                ("user-1".to_owned(), UserRoomState::Joined as i32),
-                ("user-4".to_owned(), UserRoomState::Joined as i32),
-            ]),
-            typing_user_id_list: Vec::new(),
-            display_name: None,
-            unread_count: Some(0),
-            join_rule: None,
-            is_direct: None,
-            permissions: None,
-            avatar_path: None,
-            is_favorite: None,
-            room_settings: None,
-            has_pinned_messages_changed: false,
-            pinned_messages: Vec::new(),
-            read_marker: HashMap::new(),
-            conference_url: None,
-        };
-
-        let client = ClientMock::new().pin_unpin_message_response(Ok(response.clone()));
+        let client = ClientMock::new().pin_unpin_message_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -3326,15 +3155,6 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_pin_unpin_message_called_n(1);
-        client.assert_received_response(ResponseContainer {
-            tag: 2,
-            content: Some(ResponseContent::RoomChangeEvent(response.clone())),
-        });
-
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(2, ResponseContent::RoomChangeEvent(response))
-        );
         assert!(output_rx.is_empty())
     }
 
@@ -3917,12 +3737,7 @@ mod tests {
     async fn test_poll_answer_request() {
         // Arrange
         let request = RequestContent::PollAnswerRequest(PollAnswerRequest::default());
-        let response = MessageChangeEvent {
-            message_id: "some-message-123".to_owned(),
-            ..Default::default()
-        };
-
-        let client = ClientMock::new().answer_poll_response(Ok(response.clone()));
+        let client = ClientMock::new().answer_poll_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
         let (output_tx, mut output_rx) = mpsc::channel(64);
@@ -3949,15 +3764,6 @@ mod tests {
         // Assert
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_answer_poll_called_n(1);
-        client.assert_received_response(ResponseContainer {
-            tag: 2,
-            content: Some(ResponseContent::MessageChangeEvent(response.clone())),
-        });
-
-        assert_eq!(
-            output_rx.recv().await.unwrap(),
-            create_output_task(2, ResponseContent::MessageChangeEvent(response))
-        );
         assert!(output_rx.is_empty())
     }
 

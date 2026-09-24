@@ -57,13 +57,13 @@ pub struct ClientMock {
     get_identity_providers_response: Mutex<Result<IdentityProvidersResponse>>,
     get_identity_providers_call_count: Mutex<u32>,
 
-    login_username_password_response: Mutex<Result<StatusUpdate>>,
+    login_username_password_response: Mutex<Result<()>>,
     login_username_password_call_count: Mutex<u32>,
 
-    login_sso_response: Mutex<Result<LoginSsoResponse>>,
+    login_sso_response: Mutex<Result<()>>,
     login_sso_call_count: Mutex<u32>,
 
-    recovery_key_verification_response: Mutex<Result<VerificationEndEvent>>,
+    recovery_key_verification_response: Mutex<Result<()>>,
     recovery_key_verification_call_count: Mutex<u32>,
 
     cross_signing_start_response: Mutex<Result<CrossSigningStartResponse>>,
@@ -75,7 +75,7 @@ pub struct ClientMock {
     cross_signing_confirm_response: Mutex<Result<()>>,
     cross_signing_confirm_call_count: Mutex<u32>,
 
-    abort_verification_response: Mutex<Result<VerificationEndEvent>>,
+    abort_verification_response: Mutex<Result<()>>,
     abort_verification_call_count: Mutex<u32>,
 
     get_global_settings_response: Mutex<Result<GlobalSettings>>,
@@ -93,7 +93,7 @@ pub struct ClientMock {
     get_public_rooms_response: Mutex<Result<PublicRoomListResponse>>,
     get_public_rooms_call_count: Mutex<u32>,
 
-    invite_response: Mutex<Result<RoomChangeEvent>>,
+    invite_response: Mutex<Result<()>>,
     invite_call_count: Mutex<u32>,
 
     invitation_reply_response: Mutex<Result<()>>,
@@ -108,10 +108,10 @@ pub struct ClientMock {
     create_direct_room_response: Mutex<Result<Room>>,
     create_direct_room_call_count: Mutex<u32>,
 
-    change_room_response: Mutex<Result<RoomChangeEvent>>,
+    change_room_response: Mutex<Result<()>>,
     change_room_call_count: Mutex<u32>,
 
-    leave_room_response: Mutex<Result<RoomLeftEvent>>,
+    leave_room_response: Mutex<Result<()>>,
     leave_room_call_count: Mutex<u32>,
 
     join_room_response: Mutex<Result<Room>>,
@@ -123,13 +123,13 @@ pub struct ClientMock {
     get_room_messages_response: Mutex<Result<()>>,
     get_room_messages_call_count: Mutex<u32>,
 
-    mark_as_read_response: Mutex<Result<RoomChangeEvent>>,
+    mark_as_read_response: Mutex<Result<()>>,
     mark_as_read_call_count: Mutex<u32>,
 
     activate_typing_notice_response: Mutex<Result<()>>,
     activate_typing_notice_call_count: Mutex<u32>,
 
-    pin_unpin_message_response: Mutex<Result<RoomChangeEvent>>,
+    pin_unpin_message_response: Mutex<Result<()>>,
     pin_unpin_message_call_count: Mutex<u32>,
 
     send_message_response: Mutex<Result<MessageSendResponse>>,
@@ -150,7 +150,7 @@ pub struct ClientMock {
     get_message_response: Mutex<Result<Message>>,
     get_message_call_count: Mutex<u32>,
 
-    answer_poll_response: Mutex<Result<MessageChangeEvent>>,
+    answer_poll_response: Mutex<Result<()>>,
     answer_poll_call_count: Mutex<u32>,
 }
 
@@ -204,7 +204,7 @@ impl ClientMock {
     /// The response [`Self::login_username_password`] should return.
     pub fn login_username_password_response(
         mut self,
-        response: crate::Result<StatusUpdate>,
+        response: crate::Result<()>,
     ) -> Self {
         self.login_username_password_response = Mutex::new(response.into());
         self
@@ -216,7 +216,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::login_sso`] should return.
-    pub fn login_sso_response(mut self, response: crate::Result<LoginSsoResponse>) -> Self {
+    pub fn login_sso_response(mut self, response: crate::Result<()>) -> Self {
         self.login_sso_response = Mutex::new(response.into());
         self
     }
@@ -229,7 +229,7 @@ impl ClientMock {
     /// The response [`Self::recovery_key_verification`] should return.
     pub fn recovery_key_verification_response(
         mut self,
-        response: crate::Result<VerificationEndEvent>,
+        response: crate::Result<()>,
     ) -> Self {
         self.recovery_key_verification_response = Mutex::new(response.into());
         self
@@ -279,7 +279,7 @@ impl ClientMock {
     /// The response [`Self::abort_verification`] should return.
     pub fn abort_verification_response(
         mut self,
-        response: crate::Result<VerificationEndEvent>,
+        response: crate::Result<()>,
     ) -> Self {
         self.abort_verification_response = Mutex::new(response.into());
         self
@@ -349,7 +349,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::invite`] should return.
-    pub fn invite_response(mut self, response: crate::Result<RoomChangeEvent>) -> Self {
+    pub fn invite_response(mut self, response: crate::Result<()>) -> Self {
         self.invite_response = Mutex::new(response.into());
         self
     }
@@ -404,7 +404,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::change_room`] should return.
-    pub fn change_room_response(mut self, response: crate::Result<RoomChangeEvent>) -> Self {
+    pub fn change_room_response(mut self, response: crate::Result<()>) -> Self {
         self.change_room_response = Mutex::new(response.into());
         self
     }
@@ -415,7 +415,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::leave_room`] should return.
-    pub fn leave_room_response(mut self, response: crate::Result<RoomLeftEvent>) -> Self {
+    pub fn leave_room_response(mut self, response: crate::Result<()>) -> Self {
         self.leave_room_response = Mutex::new(response.into());
         self
     }
@@ -459,7 +459,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::mark_as_read`] should return.
-    pub fn mark_as_read_response(mut self, response: crate::Result<RoomChangeEvent>) -> Self {
+    pub fn mark_as_read_response(mut self, response: crate::Result<()>) -> Self {
         self.mark_as_read_response = Mutex::new(response.into());
         self
     }
@@ -481,7 +481,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::pin_unpin_message`] should return.
-    pub fn pin_unpin_message_response(mut self, response: crate::Result<RoomChangeEvent>) -> Self {
+    pub fn pin_unpin_message_response(mut self, response: crate::Result<()>) -> Self {
         self.pin_unpin_message_response = Mutex::new(response.into());
         self
     }
@@ -558,7 +558,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::answer_poll`] should return.
-    pub fn answer_poll_response(mut self, response: crate::Result<MessageChangeEvent>) -> Self {
+    pub fn answer_poll_response(mut self, response: crate::Result<()>) -> Self {
         self.answer_poll_response = Mutex::new(response.into());
         self
     }
@@ -608,7 +608,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: LoginUsernamePasswordRequest,
-    ) -> crate::Result<StatusUpdate> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.login_username_password_call_count.lock().unwrap() += 1;
         self.login_username_password_response
@@ -622,7 +622,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: LoginSsoRequest,
-    ) -> crate::Result<LoginSsoResponse> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.login_sso_call_count.lock().unwrap() += 1;
         self.login_sso_response.lock().unwrap().clone().into()
@@ -632,7 +632,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: RecoveryKeyVerificationRequest,
-    ) -> crate::Result<VerificationEndEvent> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.recovery_key_verification_call_count.lock().unwrap() += 1;
         self.recovery_key_verification_response
@@ -688,7 +688,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: VerificationAbortRequest,
-    ) -> crate::Result<VerificationEndEvent> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.abort_verification_call_count.lock().unwrap() += 1;
         self.abort_verification_response
@@ -752,7 +752,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: InvitationRequest,
-    ) -> crate::Result<RoomChangeEvent> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.invite_call_count.lock().unwrap() += 1;
         self.invite_response.lock().unwrap().clone().into()
@@ -814,7 +814,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: RoomChangeRequest,
-    ) -> crate::Result<RoomChangeEvent> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.change_room_call_count.lock().unwrap() += 1;
         self.change_room_response.lock().unwrap().clone().into()
@@ -824,7 +824,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: RoomLeaveRequest,
-    ) -> crate::Result<RoomLeftEvent> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.leave_room_call_count.lock().unwrap() += 1;
         self.leave_room_response.lock().unwrap().clone().into()
@@ -868,7 +868,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: RoomMarkAsReadRequest,
-    ) -> crate::Result<RoomChangeEvent> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.mark_as_read_call_count.lock().unwrap() += 1;
         self.mark_as_read_response.lock().unwrap().clone().into()
@@ -892,7 +892,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: RoomPinRequest,
-    ) -> crate::Result<RoomChangeEvent> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.pin_unpin_message_call_count.lock().unwrap() += 1;
         self.pin_unpin_message_response
@@ -958,7 +958,7 @@ impl Client for ClientMock {
         &self,
         ctx: RequestContext,
         _request: PollAnswerRequest,
-    ) -> crate::Result<MessageChangeEvent> {
+    ) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.answer_poll_call_count.lock().unwrap() += 1;
         self.answer_poll_response.lock().unwrap().clone().into()

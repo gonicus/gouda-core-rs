@@ -54,11 +54,7 @@ pub trait Client: Send + Sync {
     /// Login with SSO.
     /// An [`gouda_proto::chat::StatusUpdate`] is expected when the login flow is finished.
     #[allow(unused_variables)]
-    async fn login_sso(
-        &self,
-        ctx: RequestContext,
-        request: LoginSsoRequest,
-    ) -> Result<()> {
+    async fn login_sso(&self, ctx: RequestContext, request: LoginSsoRequest) -> Result<()> {
         not_implemented_error()
     }
 
@@ -158,11 +154,7 @@ pub trait Client: Send + Sync {
 
     /// Invite users to a specific room.
     #[allow(unused_variables)]
-    async fn invite(
-        &self,
-        ctx: RequestContext,
-        request: InvitationRequest,
-    ) -> Result<()> {
+    async fn invite(&self, ctx: RequestContext, request: InvitationRequest) -> Result<()> {
         not_implemented_error()
     }
 
@@ -205,22 +197,14 @@ pub trait Client: Send + Sync {
     /// Changes a rooms settings.
     /// A [`gouda_proto::chat::RoomChangeEvent] is expected afterwards.
     #[allow(unused_variables)]
-    async fn change_room(
-        &self,
-        ctx: RequestContext,
-        request: RoomChangeRequest,
-    ) -> Result<()> {
+    async fn change_room(&self, ctx: RequestContext, request: RoomChangeRequest) -> Result<()> {
         not_implemented_error()
     }
 
     /// Leaves a room.
     /// A [`gouda_proto::chat::RoomLeftEvent] is expected afterwards.
     #[allow(unused_variables)]
-    async fn leave_room(
-        &self,
-        ctx: RequestContext,
-        request: RoomLeaveRequest,
-    ) -> Result<()> {
+    async fn leave_room(&self, ctx: RequestContext, request: RoomLeaveRequest) -> Result<()> {
         not_implemented_error()
     }
 
@@ -271,11 +255,7 @@ pub trait Client: Send + Sync {
     /// Pin or unpin a message from a room.
     /// A [`gouda_proto::chat::RoomChangeEvent] is expected afterwards.
     #[allow(unused_variables)]
-    async fn pin_unpin_message(
-        &self,
-        ctx: RequestContext,
-        request: RoomPinRequest,
-    ) -> Result<()> {
+    async fn pin_unpin_message(&self, ctx: RequestContext, request: RoomPinRequest) -> Result<()> {
         not_implemented_error()
     }
 
@@ -330,11 +310,7 @@ pub trait Client: Send + Sync {
     /// Answers a poll.
     /// A [`gouda_proto::chat::MessageChangeEvent] is expected afterwards.
     #[allow(unused_variables)]
-    async fn answer_poll(
-        &self,
-        ctx: RequestContext,
-        request: PollAnswerRequest,
-    ) -> Result<()> {
+    async fn answer_poll(&self, ctx: RequestContext, request: PollAnswerRequest) -> Result<()> {
         not_implemented_error()
     }
 

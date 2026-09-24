@@ -49,7 +49,7 @@ impl MultipartResponse {
 
     /// Sends an item part of the multipart response to the application.
     pub async fn send_item(&self, item: ResponseContent) {
-        self.ctx.send_event_with_tag(item).await;
+        self.ctx.send_response(item).await;
     }
 }
 
@@ -58,7 +58,7 @@ impl Drop for MultipartResponse {
         let ctx = self.ctx.clone();
 
         tokio::spawn(async move {
-            ctx.send_event_with_tag(ResponseContent::MultipartEnd(MultipartEnd {}))
+            ctx.send_response(ResponseContent::MultipartEnd(MultipartEnd {}))
                 .await;
         });
     }

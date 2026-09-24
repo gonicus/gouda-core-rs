@@ -39,8 +39,9 @@ impl RequestContext {
         }
     }
 
-    /// Sends an event to the output processor with the request's tag.
-    pub(crate) async fn send_event_with_tag(&self, content: ResponseContent) {
+    /// Sends a response to the receiving half.
+    /// Unlike [`Self::send_event`], responses contain the tag of the previous request.
+    pub async fn send_response(&self, content: ResponseContent) {
         self.send_to_output(ResponseContainer {
             tag: self.tag,
             content: Some(content),
@@ -49,6 +50,8 @@ impl RequestContext {
     }
 
     /// Sends an event to the receiving half.
+    /// Unlike [`Self::send_response`], events always have a tag of 0 and do not belong
+    /// to a specific request.
     pub async fn send_event(&self, content: ResponseContent) {
         self.send_to_output(ResponseContainer {
             tag: 0,
