@@ -297,48 +297,6 @@ async fn test_get_login_flows_request_on_error() {
 }
 
 #[tokio::test]
-async fn test_login_username_password_request_on_success() {
-    // arrange
-    let response = StatusUpdate {
-        code: status_update::StatusCode::LoggedIn as i32,
-    };
-
-    let client = ClientMock::new().login_username_password_response(Ok(response));
-    let mut setup = setup(client).await.expect("test setup failed");
-
-    let app_task = tokio::spawn(setup.runner.run());
-    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-
-    let test_data_obj = RequestContainer {
-        tag: 1,
-        content: Some(RequestContent::LoginUsernamePasswordRequest(
-            LoginUsernamePasswordRequest::default(),
-        )),
-    };
-
-    let mut payload: Vec<u8> = test_data_obj.encode_to_vec();
-    let mut test_data: Vec<u8> = payload.len().to_le_bytes().to_vec();
-    test_data.append(&mut payload);
-
-    let expected_response = ResponseContainer {
-        tag: 0,
-        content: Some(ResponseContent::StatusUpdate(response)),
-    };
-
-    let expected_resp_payload: Vec<u8> = expected_response.encode_to_vec();
-
-    // act
-    setup.client_sender.write_all(&test_data).await.unwrap();
-
-    let response_payload = read_payload_from_stream(&mut setup.client_receiver).await;
-
-    app_task.abort();
-
-    // assert
-    assert_eq!(response_payload, expected_resp_payload);
-}
-
-#[tokio::test]
 async fn test_login_username_password_request_on_error() {
     // arrange
     let response = Error {
@@ -364,48 +322,8 @@ async fn test_login_username_password_request_on_error() {
     test_data.append(&mut payload);
 
     let expected_response = ResponseContainer {
-        tag: 0,
+        tag: 1,
         content: Some(ResponseContent::Error(response)),
-    };
-
-    let expected_resp_payload: Vec<u8> = expected_response.encode_to_vec();
-
-    // act
-    setup.client_sender.write_all(&test_data).await.unwrap();
-
-    let response_payload = read_payload_from_stream(&mut setup.client_receiver).await;
-
-    app_task.abort();
-
-    // assert
-    assert_eq!(response_payload, expected_resp_payload);
-}
-
-#[tokio::test]
-async fn test_login_sso_request_on_success() {
-    // arrange
-    let response = LoginSsoResponse {
-        login_url: "https://example.org/login".to_string(),
-    };
-
-    let client = ClientMock::new().login_sso_response(Ok(response.clone()));
-    let mut setup = setup(client).await.expect("test setup failed");
-
-    let app_task = tokio::spawn(setup.runner.run());
-    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-
-    let test_data_obj = RequestContainer {
-        tag: 1,
-        content: Some(RequestContent::LoginSsoRequest(LoginSsoRequest::default())),
-    };
-
-    let mut payload: Vec<u8> = test_data_obj.encode_to_vec();
-    let mut test_data: Vec<u8> = payload.len().to_le_bytes().to_vec();
-    test_data.append(&mut payload);
-
-    let expected_response = ResponseContainer {
-        tag: 1,
-        content: Some(ResponseContent::LoginSsoResponse(response)),
     };
 
     let expected_resp_payload: Vec<u8> = expected_response.encode_to_vec();

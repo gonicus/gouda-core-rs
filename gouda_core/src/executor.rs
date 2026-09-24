@@ -902,7 +902,7 @@ mod tests {
         let client = ClientMock::new().login_username_password_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
@@ -970,7 +970,7 @@ mod tests {
 
         assert_eq!(
             output_rx.recv().await.unwrap(),
-            create_output_task(0, ResponseContent::Error(response))
+            create_output_task(2, ResponseContent::Error(response))
         );
         assert!(output_rx.is_empty())
     }
@@ -982,7 +982,7 @@ mod tests {
         let client = ClientMock::new().login_sso_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
@@ -1067,7 +1067,7 @@ mod tests {
         let client = ClientMock::new().recovery_key_verification_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
@@ -1133,13 +1133,13 @@ mod tests {
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_recovery_key_verification_called_n(1);
         client.assert_received_response(ResponseContainer {
-            tag: 0,
+            tag: 2,
             content: Some(ResponseContent::Error(response.clone())),
         });
 
         assert_eq!(
             output_rx.recv().await.unwrap(),
-            create_output_task(0, ResponseContent::Error(response))
+            create_output_task(2, ResponseContent::Error(response))
         );
         assert!(output_rx.is_empty())
     }
@@ -1420,7 +1420,7 @@ mod tests {
         let client = ClientMock::new().abort_verification_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
@@ -1484,13 +1484,13 @@ mod tests {
         let client = client.as_any().downcast_ref::<ClientMock>().unwrap();
         client.assert_abort_verification_called_n(1);
         client.assert_received_response(ResponseContainer {
-            tag: 0,
+            tag: 2,
             content: Some(ResponseContent::Error(response.clone())),
         });
 
         assert_eq!(
             output_rx.recv().await.unwrap(),
-            create_output_task(0, ResponseContent::Error(response))
+            create_output_task(2, ResponseContent::Error(response))
         );
         assert!(output_rx.is_empty())
     }
@@ -1989,7 +1989,7 @@ mod tests {
         let client = ClientMock::new().invite_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
@@ -2520,7 +2520,7 @@ mod tests {
         let client = ClientMock::new().change_room_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
@@ -2602,7 +2602,7 @@ mod tests {
         let client = ClientMock::new().leave_room_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
@@ -2965,7 +2965,7 @@ mod tests {
         let client = ClientMock::new().mark_as_read_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
@@ -3131,7 +3131,7 @@ mod tests {
         let client = ClientMock::new().pin_unpin_message_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
@@ -3740,7 +3740,7 @@ mod tests {
         let client = ClientMock::new().answer_poll_response(Ok(()));
 
         let (executor_tx, executor_rx) = mpsc::channel(64);
-        let (output_tx, mut output_rx) = mpsc::channel(64);
+        let (output_tx, output_rx) = mpsc::channel(64);
 
         let executor = Executor::new(
             Arc::new(client),
