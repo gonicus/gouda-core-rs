@@ -202,10 +202,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::login_username_password`] should return.
-    pub fn login_username_password_response(
-        mut self,
-        response: crate::Result<()>,
-    ) -> Self {
+    pub fn login_username_password_response(mut self, response: crate::Result<()>) -> Self {
         self.login_username_password_response = Mutex::new(response.into());
         self
     }
@@ -227,10 +224,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::recovery_key_verification`] should return.
-    pub fn recovery_key_verification_response(
-        mut self,
-        response: crate::Result<()>,
-    ) -> Self {
+    pub fn recovery_key_verification_response(mut self, response: crate::Result<()>) -> Self {
         self.recovery_key_verification_response = Mutex::new(response.into());
         self
     }
@@ -277,10 +271,7 @@ impl ClientMock {
     }
 
     /// The response [`Self::abort_verification`] should return.
-    pub fn abort_verification_response(
-        mut self,
-        response: crate::Result<()>,
-    ) -> Self {
+    pub fn abort_verification_response(mut self, response: crate::Result<()>) -> Self {
         self.abort_verification_response = Mutex::new(response.into());
         self
     }
@@ -618,11 +609,7 @@ impl Client for ClientMock {
             .into()
     }
 
-    async fn login_sso(
-        &self,
-        ctx: RequestContext,
-        _request: LoginSsoRequest,
-    ) -> crate::Result<()> {
+    async fn login_sso(&self, ctx: RequestContext, _request: LoginSsoRequest) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.login_sso_call_count.lock().unwrap() += 1;
         self.login_sso_response.lock().unwrap().clone().into()
@@ -748,11 +735,7 @@ impl Client for ClientMock {
             .into()
     }
 
-    async fn invite(
-        &self,
-        ctx: RequestContext,
-        _request: InvitationRequest,
-    ) -> crate::Result<()> {
+    async fn invite(&self, ctx: RequestContext, _request: InvitationRequest) -> crate::Result<()> {
         *self.received_ctx.lock().unwrap() = Some(ctx);
         *self.invite_call_count.lock().unwrap() += 1;
         self.invite_response.lock().unwrap().clone().into()
