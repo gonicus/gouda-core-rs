@@ -19,6 +19,7 @@ pub struct RoomChangeEventBuilder {
     pinned_messages: Option<Vec<String>>,
     read_marker: HashMap<String, u64>,
     conference_url: Option<String>,
+    low_priority: Option<bool>,
 }
 
 impl RoomChangeEventBuilder {
@@ -78,6 +79,10 @@ impl RoomChangeEventBuilder {
 
         if old.conference_url != new.conference_url {
             obj = obj.change_conference_url(new.conference_url.clone().unwrap_or_default());
+        }
+
+        if old.low_priority != new.low_priority {
+            obj = obj.change_low_priority(new.low_priority);
         }
 
         obj
@@ -148,6 +153,11 @@ impl RoomChangeEventBuilder {
         self
     }
 
+    pub fn change_low_priority(mut self, low_priority: bool) -> Self {
+        self.low_priority = Some(low_priority);
+        self
+    }
+
     pub fn to_proto(self) -> RoomChangeEvent {
         let mut event = RoomChangeEvent {
             room_id: self.room_id,
@@ -167,6 +177,7 @@ impl RoomChangeEventBuilder {
             pinned_messages: Vec::new(),
             read_marker: self.read_marker,
             conference_url: self.conference_url,
+            low_priority: self.low_priority,
         };
 
         if let Some(user_id_list) = self.user_id_list {
@@ -356,6 +367,7 @@ mod tests {
             pinned_messages: vec!["message-1".to_owned()],
             read_marker: HashMap::from([("user-1".to_owned(), 2)]),
             conference_url: Some("Conference 1".to_owned()),
+            low_priority: false,
         };
 
         let new = Room {
@@ -385,6 +397,7 @@ mod tests {
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
             read_marker: HashMap::from([("user-1".to_owned(), 5)]),
             conference_url: Some("Conference 2".to_owned()),
+            low_priority: true,
         };
 
         let expected = RoomChangeEventBuilder {
@@ -415,6 +428,7 @@ mod tests {
             pinned_messages: Some(vec!["message-1".to_owned(), "message-2".to_owned()]),
             read_marker: HashMap::from([("user-1".to_owned(), 5)]),
             conference_url: Some("Conference 2".to_owned()),
+            low_priority: Some(true),
         };
 
         let result = RoomChangeEventBuilder::compare_rooms(&old, &new);
@@ -502,6 +516,7 @@ mod tests {
             pinned_messages: Some(vec!["message-1".to_owned(), "message-2".to_owned()]),
             read_marker: HashMap::from([("user-1".to_owned(), 5)]),
             conference_url: Some("Conference 2".to_owned()),
+            low_priority: Some(true),
         };
 
         let expected = RoomChangeEvent {
@@ -532,6 +547,7 @@ mod tests {
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
             read_marker: HashMap::from([("user-1".to_owned(), 5)]),
             conference_url: Some("Conference 2".to_owned()),
+            low_priority: Some(true),
         };
 
         let result = builder.to_proto();

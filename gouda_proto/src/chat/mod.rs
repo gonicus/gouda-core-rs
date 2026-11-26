@@ -164,6 +164,10 @@ impl RoomChangeEvent {
                 room.conference_url = Some(conference_url);
             }
         }
+
+        if let Some(low_priority) = self.low_priority {
+            room.low_priority = low_priority;
+        }
     }
 }
 
@@ -253,6 +257,7 @@ mod tests {
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
             read_marker: HashMap::new(),
             conference_url: Some("Conference 1".to_string()),
+            low_priority: Some(true),
         };
 
         let expected = Room {
@@ -274,6 +279,7 @@ mod tests {
             pinned_messages: vec!["message-1".to_owned(), "message-2".to_owned()],
             read_marker: HashMap::new(),
             conference_url: Some("Conference 1".to_owned()),
+            low_priority: true,
         };
 
         let mut room = Room {
