@@ -1305,6 +1305,9 @@ pub struct Room {
     /// The conference url, if the room is associated with a conference.
     #[prost(string, optional, tag = "16")]
     pub conference_url: ::core::option::Option<::prost::alloc::string::String>,
+    /// If the room is a low priority room.
+    #[prost(bool, tag = "17")]
+    pub low_priority: bool,
 }
 /// Defines single points of authorization for a room that may or may not be done
 /// by this client's user.
@@ -1402,6 +1405,9 @@ pub struct RoomChangeEvent {
     /// Updated conference url, if it has changed.
     #[prost(string, optional, tag = "17")]
     pub conference_url: ::core::option::Option<::prost::alloc::string::String>,
+    /// Updated low priority flag, if it has changed.
+    #[prost(bool, optional, tag = "18")]
+    pub low_priority: ::core::option::Option<bool>,
 }
 /// Notify the client that messages and notifications in this room have been
 /// read by the user.
@@ -1635,6 +1641,9 @@ pub struct RoomChangeRequest {
     /// If the conference the room is associated with should be changed.
     #[prost(string, optional, tag = "6")]
     pub conference_url: ::core::option::Option<::prost::alloc::string::String>,
+    /// If the low priority flag of the room should be changed.
+    #[prost(bool, optional, tag = "7")]
+    pub low_priority: ::core::option::Option<bool>,
 }
 /// Request to leave a specific room.
 /// Expects a RoomLeftEvent next.

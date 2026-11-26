@@ -2044,6 +2044,7 @@ mod tests {
             pinned_messages: Vec::new(),
             read_marker: HashMap::new(),
             conference_url: None,
+            low_priority: None,
         };
 
         let client = ClientMock::new().invite_response(Ok(response.clone()));
@@ -2244,6 +2245,7 @@ mod tests {
                     pinned_messages: Vec::new(),
                     read_marker: HashMap::new(),
                     conference_url: None,
+                    low_priority: false,
                 },
                 Room {
                     room_id: "room-2".to_owned(),
@@ -2265,6 +2267,7 @@ mod tests {
                     pinned_messages: Vec::new(),
                     read_marker: HashMap::new(),
                     conference_url: None,
+                    low_priority: false,
                 },
             ],
         };
@@ -2380,6 +2383,7 @@ mod tests {
             pinned_messages: Vec::new(),
             read_marker: HashMap::new(),
             conference_url: None,
+            low_priority: false,
         };
 
         let client = ClientMock::new().create_group_room_response(Ok(response.clone()));
@@ -2493,6 +2497,7 @@ mod tests {
             pinned_messages: Vec::new(),
             read_marker: HashMap::new(),
             conference_url: None,
+            low_priority: false,
         };
 
         let client = ClientMock::new().create_direct_room_response(Ok(response.clone()));
@@ -2607,6 +2612,7 @@ mod tests {
             pinned_messages: Vec::new(),
             read_marker: HashMap::new(),
             conference_url: None,
+            low_priority: None,
         };
 
         let client = ClientMock::new().change_room_response(Ok(response.clone()));
@@ -2817,6 +2823,7 @@ mod tests {
             pinned_messages: Vec::new(),
             read_marker: HashMap::new(),
             conference_url: None,
+            low_priority: false,
         };
 
         let client = ClientMock::new().join_room_response(Ok(response.clone()));
@@ -3099,6 +3106,7 @@ mod tests {
             pinned_messages: Vec::new(),
             read_marker: HashMap::new(),
             conference_url: None,
+            low_priority: None,
         };
 
         let client = ClientMock::new().mark_as_read_response(Ok(response.clone()));
@@ -3297,6 +3305,7 @@ mod tests {
             pinned_messages: Vec::new(),
             read_marker: HashMap::new(),
             conference_url: None,
+            low_priority: None,
         };
 
         let client = ClientMock::new().pin_unpin_message_response(Ok(response.clone()));
